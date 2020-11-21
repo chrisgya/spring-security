@@ -1,0 +1,89 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /security
+  shutdown: graceful
+
+spring:
+  application:
+    name: spring-jwt-security
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    name: jpa-pg-datasource
+    url: 'jdbc:postgresql://localhost:5432/spring_security_db'
+    username: postgres
+    password: Password@1
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update # Hibernate ddl auto (create, create-drop, validate, update)
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 5MB
+  mail:
+    default-encoding: UTF-8
+    host:
+    username:
+    port:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+#  flyway:
+#    user: postgres
+#    password: Password@1
+
+  logging:
+    level:
+      org:
+        springframework: DEBUG
+    pattern:
+      console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
+
+  file:
+    directory: C://temp/${spring.application.name}
+    size-limit: 1024
+    image-size-limit: 10
+    image-extensions: jpg, jpeg, png
+
+app:
+  security:
+    jwt:
+      keystore-location: keys/keystore_chrisgya.jks
+      keystore-password: Password@1
+      key-alias: chrisgyaspsec
+      private-key-passphrase: Password@1
+      bycriptStrength: 12
+      tokenExpirationAfterDays: 7
+      tokenPrefix: 'Bearer '
+      issuer: chrisgya
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
