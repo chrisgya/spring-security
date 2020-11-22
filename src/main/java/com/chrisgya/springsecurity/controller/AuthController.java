@@ -22,8 +22,8 @@ public class AuthController {
 
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.OK)
-    public void authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse res) {
-        res.addHeader("Authorization", jwtProperties.getTokenPrefix() + userService.login(loginRequest));
+    public void authenticateUser(@Valid @RequestBody LoginRequest req, HttpServletResponse res) {
+        res.addHeader("Authorization", jwtProperties.getTokenPrefix() + userService.login(req));
     }
 
     @PostMapping("/signup")

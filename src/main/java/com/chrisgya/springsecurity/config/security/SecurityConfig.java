@@ -5,6 +5,7 @@ import com.chrisgya.springsecurity.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -15,8 +16,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -46,7 +52,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 .anyRequest()
                                 .authenticated()
                 )
-        .exceptionHandling().disable()
+        .exceptionHandling().accessDeniedHandler(
+                new AccessDeniedHandlerImpl() {
+                    @Override
+                    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                        super.handle(request, response, accessDeniedException);
+                        throw new AccessDeniedException(accessDeniedException.getMessage());
+                    }
+                }
+        ).and()
         .addFilterBefore(new JwtTokenVerifier(jwtProperties,privateKey, publicKey), UsernamePasswordAuthenticationFilter.class);
     }
 
