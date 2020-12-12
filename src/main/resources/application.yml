@@ -27,12 +27,15 @@ spring:
   servlet:
     multipart:
       max-file-size: 1MB
-      max-request-size: 5MB
+      max-request-size: 10MB
+  main:
+    anner-mode: off
   mail:
     default-encoding: UTF-8
-    host:
-    username:
-    port:
+    host: smtp.mailtrap.io
+    username: ba82994703feaa
+    password: ea2c03a9a0d824
+    port: 2525
     properties:
       mail:
         smtp:
@@ -41,6 +44,7 @@ spring:
             enable: true
     protocol: smtp
     test-connection: false
+
 
 management:
   endpoints:
@@ -66,8 +70,6 @@ management:
 
   file:
     directory: C://temp/${spring.application.name}
-    size-limit: 1024
-    image-size-limit: 10
     image-extensions: jpg, jpeg, png
 
 app:

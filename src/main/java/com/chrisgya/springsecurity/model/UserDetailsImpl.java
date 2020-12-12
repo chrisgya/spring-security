@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -29,22 +30,23 @@ public class UserDetailsImpl implements UserDetails {
     private LocalDate lockExpiryDate;
     private boolean isEnabled;
     private boolean isConfirmed;
-    private boolean isDeleted;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl build(User user, List<String> permissions) {
 
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
 
-        user.getRoles().stream()
-                .forEach(role -> {
-                    role.getPermissions().stream()
-                            .forEach(p -> authorities.add(new SimpleGrantedAuthority(p.getName())));
+//        user.getRoles().stream()
+//                .forEach(role -> {
+//                    role.getPermissions().stream()
+//                            .forEach(p -> authorities.add(new SimpleGrantedAuthority(p.getName())));
+//
+//                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+//
+//                });
 
-                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
 
-                });
-
+        permissions.forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission)));
 
         return new UserDetailsImpl(
                 user.getId(),
@@ -52,13 +54,12 @@ public class UserDetailsImpl implements UserDetails {
                 user.getEmail(),
                 user.getFirstName(),
                 user.getMiddleName(),
-                user.getLastname(),
+                user.getLastName(),
                 user.getPassword(),
                 user.isLocked(),
                 user.getLockExpiryDate(),
                 user.isEnabled(),
                 user.isConfirmed(),
-                user.isDeleted(),
                 authorities
         );
     }
@@ -98,25 +99,4 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return isEnabled;
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        UserDetailsImpl that = (UserDetailsImpl) o;
-//        return id == that.id &&
-//                isLocked == that.isLocked &&
-//                isEnabled == that.isEnabled &&
-//                isConfirmed == that.isConfirmed &&
-//                isDeleted == that.isDeleted &&
-//                Objects.equals(username, that.username) &&
-//                Objects.equals(email, that.email) &&
-//                Objects.equals(firstName, that.firstName) &&
-//                Objects.equals(middleName, that.middleName) &&
-//                Objects.equals(lastname, that.lastname) &&
-//                Objects.equals(password, that.password) &&
-//                Objects.equals(lockExpiryDate, that.lockExpiryDate) &&
-//                Objects.equals(authorities, that.authorities);
-//    }
-
 }

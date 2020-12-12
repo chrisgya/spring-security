@@ -27,4 +27,7 @@ public class Role extends AbstractEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false, updatable = false)},
             inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName = "id", nullable = false, updatable = false)})
     private Set<Permission> permissions = new HashSet<>();
+
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<UserRoles> userRoles = new HashSet<>();
 }

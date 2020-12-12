@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class UserServiceImpl{
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,6 +39,7 @@ public class UserServiceImpl{
     private final JwtHelper jwtHelper;
 
 
+    @Override
     public String login(LoginRequest req) {
 
         try   {
@@ -57,9 +58,6 @@ public class UserServiceImpl{
             }
             if(!userDetails.isEnabled()){
                 throw new BadRequestException("account is disabled. please contact support team for assistance");
-            }
-            if(userDetails.isDeleted()){
-                throw new BadRequestException("login failed");
             }
 
             Map<String, String> claims = new HashMap<>();
@@ -81,6 +79,7 @@ public class UserServiceImpl{
     }
 
 
+    @Override
     public User registerUser(RegisterUserRequest req) {
 
         if (userRepository.existsByUsername(req.getUsername())) {
@@ -96,30 +95,38 @@ public class UserServiceImpl{
                 .email(req.getEmail())
                 .firstName(req.getFirstName())
                 .middleName(req.getMiddleName())
-                .lastname(req.getLastname())
+                .lastName(req.getLastname())
                 .password(passwordEncoder.encode(req.getPassword()))
                 .isEnabled(true)
                 .build();
 
-        req.getRoleIds().ifPresent(roleIds -> {
-            var roles = roleRepository.findAllById(roleIds).stream().collect(Collectors.toSet());
-            user.setRoles(roles);
-        });
+//        req.getRoleIds().ifPresent(roleIds -> {
+//            var roles = roleRepository.findAllById(roleIds).stream().collect(Collectors.toSet());
+//            user.setRoles(roles);
+//        });
+
+//        req.getRoleIds().ifPresent(roleIds -> {
+//            var roles = roleRepository.findAllById(roleIds).stream().collect(Collectors.toSet());
+//            user.setUserRoles().setRoles(roles);
+//        });
 
         userRepository.save(user);
         return user;
     }
 
+    @Override
     public User getUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("no user found"));
     }
 
+    @Override
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("no user found"));
     }
 
+    @Override
     public Page<User> getUsers(UserParameters params, UserPage userPage) {
         Specification usernameSpec = UserSpecification.userUsernameEquals(params.getUsersUsername());
         Specification emailSpec = UserSpecification.userEmailEquals(params.getUsersEmail());

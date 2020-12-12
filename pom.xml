@@ -18,6 +18,7 @@
 		<java.version>11</java.version>
 		<java-jwt.version>3.11.0</java-jwt.version>
 		<micrometer.version>1.6.1</micrometer.version>
+		<itextpdf.version>5.5.13.2</itextpdf.version>
 	</properties>
 
 	<dependencies>
@@ -42,6 +43,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jdbc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -78,6 +83,17 @@
 <!--			<groupId>org.flywaydb</groupId>-->
 <!--			<artifactId>flyway-core</artifactId>-->
 <!--		</dependency>-->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>${itextpdf.version}</version>
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.xhtmlrenderer</groupId>-->
+<!--			<artifactId>flying-saucer-pdf</artifactId>-->
+<!--			<version>9.1.20</version>-->
+<!--		</dependency>-->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>

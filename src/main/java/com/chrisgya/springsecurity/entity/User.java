@@ -29,7 +29,7 @@ public class User extends AbstractEntity implements Serializable {
     @Column(name = "middle_name", length = 50)
     private String middleName;
     @Column(name = "last_name", nullable = false, length = 50)
-    private String lastname;
+    private String lastName;
     @Column(name = "password", nullable = false, length = 1000)
     private String password;
     @Column(name = "is_locked")
@@ -40,13 +40,16 @@ public class User extends AbstractEntity implements Serializable {
     private boolean isEnabled;
     @Column(name = "is_confirmed")
     private boolean isConfirmed;
-    @Column(name = "is_deleted")
-    private boolean isDeleted;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "user_roles",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false, updatable = false)})
-    private Set<Role> roles = new HashSet<>();
 
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+//    @JoinTable(name = "user_roles",
+//            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)},
+//            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false, updatable = false)})
+//    private Set<Role> roles = new HashSet<>();
+
+
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<UserRoles> userRoles = new HashSet<>();
 }
