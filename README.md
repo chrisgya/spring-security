@@ -8,3 +8,6 @@ keytool -genkey -alias <alias> -keyalg RSA -keystore <keystore_name>  -keysize 2
 
 I’m using the following command to generate the keypair and move on with our solution:
  keytool -genkey -alias chrisgyaspsec -keyalg RSA -keystore keystore_chrisgya.jks  -keysize 4096
+
+References
+### https://ordina-jworks.github.io/monitoring/2020/11/16/monitoring-spring-prometheus-grafana.html

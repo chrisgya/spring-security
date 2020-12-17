@@ -1,11 +1,15 @@
 package com.chrisgya.springsecurity.service;
 
+import org.springframework.scheduling.annotation.Async;
+
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 
 public interface EmailService {
-    void sendMail(String toEmail, String subject, String message);
 
-    void sendMailWithAttachment(String to, String subject, String body, String fileToAttach, String attachmentNameWithExtension);
+    @Async
+    void sender(String templateName, String subject, String mailTo, Map<String, Object> thymeLeafProps, Map<String, String> fileAttachments, Map<String, ByteArrayInputStream> bisAttachments);
 
-    void sendMailWithAttachment(String to, String subject, String body, ByteArrayInputStream bis, String attachmentNameWithExtension);
+    @Async
+    void sender(String to, String subject, String body, ByteArrayInputStream bis, String attachmentNameWithExtension);
 }

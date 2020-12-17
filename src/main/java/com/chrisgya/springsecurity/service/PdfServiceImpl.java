@@ -5,16 +5,30 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 @Slf4j
-public class ExportPDF {
+@Service
+public class PdfServiceImpl implements PdfService {
 
-    public static ByteArrayInputStream userReport(User user){
+    private static final String PDF_RESOURCES = "/templates/mail/";
+    private final SpringTemplateEngine templateEngine;
+
+
+    @Override
+    public ByteArrayInputStream userReport(User user, String tableTile, String[] tableColumns){
         var document = new Document();
         var out = new ByteArrayOutputStream();
 
@@ -24,7 +38,7 @@ public class ExportPDF {
 
             //add text to PDF file
             Font font = FontFactory.getFont(FontFactory.COURIER, 14, BaseColor.BLACK);
-            var para = new Paragraph("User Table", font);
+            var para = new Paragraph(tableTile, font);
             para.setAlignment(Element.ALIGN_CENTER);
             document.add(para);
             document.add(Chunk.NEWLINE);
@@ -34,7 +48,7 @@ public class ExportPDF {
 
             Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
 
-            Stream.of("First Name", "Last Name", "Email")
+            Stream.of(tableColumns)
                     .forEach(headerTitle -> {
                         PdfPCell hCell;
                         //table header
@@ -75,4 +89,29 @@ public class ExportPDF {
 
         return new ByteArrayInputStream(out.toByteArray());
     }
+
+    @Override
+    public File generatePdfFromHtml(User user) throws IOException, com.lowagie.text.DocumentException {
+        Context context = new Context();
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("user", user);
+        context.setVariables(variables);
+
+        String html = templateEngine.process("user-template", context);
+
+            return renderPdf(html);
+    }
+
+    private File renderPdf(String html) throws IOException, com.lowagie.text.DocumentException {
+        File file = File.createTempFile("user", ".pdf");
+        OutputStream outputStream = new FileOutputStream(file);
+        ITextRenderer renderer = new ITextRenderer(20f * 4f / 3f, 20);
+        renderer.setDocumentFromString(html, new ClassPathResource(PDF_RESOURCES).getURL().toExternalForm());
+        renderer.layout();
+        renderer.createPDF(outputStream);
+        outputStream.close();
+        file.deleteOnExit();
+        return file;
+    }
+
 }

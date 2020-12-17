@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Details</title>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
+
+    <!-- use the font -->
+    <style>
+          body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+        }
+        .center{
+            text-align: center;
+        }
+        .top-margin{
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<p th:text="${'Dear ' + user.firstName + ','}"></p>
+
+<p>
+ Example HTML PDF Generator showing how to generate PDF from hmtl
+</p>
+
+
+<div>
+    <ul>
+        <li><span>First Name: </span><span th:text="${user.firstName}"></span></li>
+        <li><span>Middle Name: </span><span th:text="${user?.middleName}"></span></li>
+        <li><span>Last Name: </span><span th:text="${user.lastName}"></span></li>
+        <li><span>User Name: </span><span th:text="${user.username}"></span></li>
+        <li><span>Email: </span><span th:text="${user.email}"></span></li>
+    </ul>
+</div>
+
+
+
+<p class="center">
+    ©<span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span> Chrisgya Solutions. All rights reserved
+</p>
+
+</body>
+</html>

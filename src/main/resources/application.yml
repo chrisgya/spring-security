@@ -89,3 +89,8 @@ logging:
     org:
       springframework:
         security: DEBUG
+
+custom-thread:
+  core-pool-size: 4
+  max-pool-size: 10
+  queue-capacity: 100
