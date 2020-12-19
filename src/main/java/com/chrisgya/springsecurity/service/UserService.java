@@ -7,6 +7,8 @@ import com.chrisgya.springsecurity.model.UserPage;
 import com.chrisgya.springsecurity.model.UserParameters;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface UserService {
     String login(LoginRequest req);
 
@@ -17,4 +19,5 @@ public interface UserService {
     User getUserByEmail(String email);
 
     Page<User> getUsers(UserParameters params, UserPage userPage);
+    List<User> getUsers();
 }

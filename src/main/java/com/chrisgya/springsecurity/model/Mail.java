@@ -2,6 +2,7 @@ package com.chrisgya.springsecurity.model;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
@@ -15,4 +16,5 @@ public class Mail{
     private Map<String, String> fileAttachments;
     private Map<String, ByteArrayInputStream> bisAttachments;
     private Map<String, Object> thymeLeafProps;
+    private MediaType mediaType;
 }

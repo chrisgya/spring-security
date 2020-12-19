@@ -151,4 +151,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll(spec, pageable);
     }
 
+    @Override
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+
 }

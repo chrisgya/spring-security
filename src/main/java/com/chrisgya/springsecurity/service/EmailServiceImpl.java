@@ -4,6 +4,7 @@ import com.chrisgya.springsecurity.model.Mail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -32,14 +33,16 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sender(String templateName, String subject, String mailTo, Map<String, Object> thymeLeafProps, Map<String, String> fileAttachments, Map<String, ByteArrayInputStream> bisAttachments) {
+    public void sender(String templateName, String subject, String mailTo, Map<String, Object> thymeLeafProps, Map<String, String> fileAttachments, Map<String, ByteArrayInputStream> bisAttachments, MediaType mediaType) {
         Mail mail = Mail.builder()
                 .from("chrisgya@gmail.com")
                 .mailTo(mailTo)
                 .subject(subject)
                 .fileAttachments(fileAttachments)
                 .bisAttachments(bisAttachments)
-                .thymeLeafProps(thymeLeafProps).build();
+                .thymeLeafProps(thymeLeafProps)
+                .mediaType(mediaType)
+                .build();
 
         try {
             sendEmail(mail, templateName);
@@ -72,7 +75,7 @@ public class EmailServiceImpl implements EmailService {
         if (mail.getBisAttachments() != null) {
             mail.getBisAttachments().forEach((name, bis) -> {
                 try {
-                    DataSource attachment = new ByteArrayDataSource(bis, "application/pdf");
+                    DataSource attachment = new ByteArrayDataSource(bis, mail.getMediaType().toString());
 
                     helper.addAttachment(name, attachment);
 
@@ -99,7 +102,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sender(String to, String subject, String body, ByteArrayInputStream bis, String attachmentNameWithExtension) {
+    public void sender(String to, String subject, String body, ByteArrayInputStream bis, MediaType mediaType, String attachmentNameWithExtension) {
 
         emailSender.send(mimeMessage -> {
             var mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -107,7 +110,7 @@ public class EmailServiceImpl implements EmailService {
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setText(body, true);
 
-            DataSource attachment = new ByteArrayDataSource(bis, "application/pdf");
+            DataSource attachment = new ByteArrayDataSource(bis, mediaType.toString());
 
             mimeMessageHelper.addAttachment(attachmentNameWithExtension, attachment);
 
