@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class ExcelFileExporter {
@@ -47,6 +48,13 @@ public class ExcelFileExporter {
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
+        }
+    }
+
+    public static void downloadCsv(PrintWriter writer, List<User> users) {
+        writer.write("User Name, First Name, Last Name \n");
+        for (User user : users) {
+            writer.write(user.getUsername() + "," + user.getFirstName() + "," + user.getLastName() + "\n");
         }
     }
 

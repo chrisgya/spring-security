@@ -97,6 +97,14 @@ public class UserController {
         IOUtils.copy(stream, response.getOutputStream());
     }
 
+    // http://localhost:8080/security/api/v1/users/export-csv.csv
+    @GetMapping("export-csv.csv")
+    public void downloadCsv(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; file=user.csv");
+        var users = userService.getUsers();
+        ExcelFileExporter.downloadCsv(response.getWriter(), users) ;
+    }
 
     private void sendEmail(User user, ByteArrayInputStream bis, MediaType mediaType, String attachmentName) {
         var subject = "sending email with attachment example";
