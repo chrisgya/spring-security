@@ -115,8 +115,11 @@ public class UserController {
 
     private void sendEmailWithHtmlTemplate(User user, ByteArrayInputStream bis, MediaType mediaType, String attachmentName) {
         var subject = "sending email with html template & attachment example";
+        var body = "<html><body> <p><strong>hello</strong>, <br /><br /> This is just a testing message body.</p> <br /><br /> Thank you.</body></html>";
+
         Map<String, Object> thymeLeafProps = new HashMap<>();
         thymeLeafProps.put("name", user.getFirstName());
+        thymeLeafProps.put("body", body);
 
         Map<String, ByteArrayInputStream> bisAttachments = new HashMap<>();
         bisAttachments.put(attachmentName , bis);

@@ -1,4 +1,4 @@
-package com.chrisgya.springsecurity.model;
+package com.chrisgya.springsecurity.model.request;
 
 import lombok.Data;
 

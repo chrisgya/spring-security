@@ -25,7 +25,11 @@ public class JwtProperties {
     @NotNull
     private Integer bycriptStrength;
     @NotNull
-    private Integer tokenExpirationAfterDays;
+    private Long tokenExpirationAfterSeconds;
+    @NotNull
+    private Long activationTokenExpirationAfterSeconds;
+    @NotNull
+    private Long refreshTokenExpiresAfterSeconds;
 
     public String getAuthorizationHeader() {
         return HttpHeaders.AUTHORIZATION;

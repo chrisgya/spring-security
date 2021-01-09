@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -27,9 +27,11 @@ public class UserDetailsImpl implements UserDetails {
     //@JsonIgnore
     private String password;
     private boolean isLocked;
-    private LocalDate lockExpiryDate;
+    private Instant lockExpiryDate;
     private boolean isEnabled;
     private boolean isConfirmed;
+    private String pictureUrl;
+    private Instant lastUpdated;
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(User user, List<String> permissions) {
@@ -60,6 +62,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getLockExpiryDate(),
                 user.isEnabled(),
                 user.isConfirmed(),
+                user.getPictureUrl(),
+                user.getLastUpdated(),
                 authorities
         );
     }

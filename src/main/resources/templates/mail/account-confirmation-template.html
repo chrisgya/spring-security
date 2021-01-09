@@ -24,7 +24,14 @@
 
 <p th:text="${'Dear ' + name + ','}"></p>
 
-<div th:text="${body}"></div>
+<p>
+    Please click  <a th:href="${url}">here</a> to activate your account.
+</p>
+
+<p>
+   You can copy same link below and paste in the browser should you have problem clicking the link above <br /><br />
+    <a th:href="${url}"><span th:text="${url}"></span></a>
+</p>
 
 
 <p>

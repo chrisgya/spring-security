@@ -4,14 +4,17 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.chrisgya.springsecurity.config.properties.JwtProperties;
+import com.chrisgya.springsecurity.model.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -21,12 +24,21 @@ private final JwtProperties jwtProperties;
     private final RSAPrivateKey privateKey;
     private final RSAPublicKey publicKey;
 
-    public String createJwtForClaims(String subject, Map<String, String> claims, List<String> list) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(Instant.now().toEpochMilli());
-        calendar.add(Calendar.DATE, 1);
+    public String createJwtForClaims(UserDetailsImpl userDetails) {
 
-        JWTCreator.Builder jwtBuilder = JWT.create().withSubject(subject).withClaim("authorities", list);
+        Map<String, String> claims = new HashMap<>();
+        claims.put("username", userDetails.getUsername());
+
+        List<String> authorities = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        claims.put("userId", String.valueOf(userDetails.getId()));
+        claims.put("firstName", userDetails.getFirstName());
+        claims.put("middleName", userDetails.getMiddleName());
+        claims.put("lastname", userDetails.getLastname());
+
+        JWTCreator.Builder jwtBuilder = JWT.create().withSubject(userDetails.getEmail()).withClaim("authorities", authorities);
 
         // Add claims
         claims.forEach(jwtBuilder::withClaim);
@@ -36,7 +48,7 @@ private final JwtProperties jwtProperties;
                 .withJWTId(UUID.randomUUID().toString())
                 .withIssuer(jwtProperties.getIssuer())
                 .withNotBefore(new Date())
-                .withExpiresAt(calendar.getTime())
+                .withExpiresAt(Date.from(Instant.now().plusSeconds(jwtProperties.getTokenExpirationAfterSeconds())))
                 .sign(Algorithm.RSA256(publicKey, privateKey));
     }
 

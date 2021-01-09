@@ -1,8 +1,8 @@
 package com.chrisgya.springsecurity.controller;
 
 import com.chrisgya.springsecurity.config.properties.JwtProperties;
-import com.chrisgya.springsecurity.model.LoginRequest;
 import com.chrisgya.springsecurity.model.RegisterUserRequest;
+import com.chrisgya.springsecurity.model.request.LoginRequest;
 import com.chrisgya.springsecurity.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,13 +23,29 @@ public class AuthController {
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.OK)
     public void authenticateUser(@Valid @RequestBody LoginRequest req, HttpServletResponse res) {
-        res.addHeader("Authorization", jwtProperties.getTokenPrefix() + userService.login(req));
+        var result = userService.login(req);
+        res.addHeader("Authorization", jwtProperties.getTokenPrefix() + result.getAccessToken());
+        res.addHeader("Refresh-Token", result.getRefreshToken());
+    }
+
+    @GetMapping("/refresh-token/{token}")
+    @ResponseStatus(HttpStatus.OK)
+    public void refreshToken(@PathVariable String token, HttpServletResponse res) {
+        var result = userService.refreshToken(token);
+        res.addHeader("Authorization", jwtProperties.getTokenPrefix() + result.getAccessToken());
+        res.addHeader("Refresh-Token", result.getRefreshToken());
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest req) {
         var response = userService.registerUser(req);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/verify-account/{token}")
+    @ResponseStatus(HttpStatus.OK)
+    public void verifyAccount(@PathVariable String token) {
+        userService.verifyAccount(token);
     }
 
 }

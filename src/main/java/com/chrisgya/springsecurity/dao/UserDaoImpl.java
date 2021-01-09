@@ -18,7 +18,7 @@ public class UserDaoImpl implements UserDao {
     private final String DELETE_USER_QUERY = "DELETE FROM user WHERE id=?";
     private final String GET_USER_BY_ID_QUERY = "SELECT * FROM user where id = ?";
     private final String GET_USERS_QUERY = "SELECT * FROM user";
-    private final String GET_USER_PERMISSIONS_QUERY = "SELECT name FROM permissions p JOIN role_permissions rp ON p.id=rp.permission_id JOIN user_roles ur ON rp.role_id= ur.role_id WHERE user_id=?";
+    private final String GET_USER_PERMISSIONS_QUERY = "SELECT name FROM bp.permissions p JOIN bp.role_permissions rp ON p.id=rp.permission_id JOIN bp.user_roles ur ON rp.role_id= ur.role_id WHERE user_id=?";
 
     @Override
     public int save(User user) {

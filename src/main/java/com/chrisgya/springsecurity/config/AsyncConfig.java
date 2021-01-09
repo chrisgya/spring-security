@@ -8,6 +8,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @EnableAsync
 @Configuration
@@ -23,5 +25,11 @@ public class AsyncConfig {
         executor.setThreadNamePrefix("MyAsync-");
         executor.initialize();
         return executor;
+    }
+
+    @Bean
+    ExecutorService executorService(CustomThreadProperties customThreadProperties){
+        ExecutorService executorService = Executors.newFixedThreadPool(customThreadProperties.getMaxPoolSize());
+        return executorService;
     }
 }

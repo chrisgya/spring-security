@@ -23,13 +23,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update # Hibernate ddl auto (create, create-drop, validate, update)
+      ddl-auto: validate # Hibernate ddl auto (create, create-drop, validate, update)
   servlet:
     multipart:
       max-file-size: 1MB
       max-request-size: 10MB
   main:
-    anner-mode: off
+    banner-mode: off
   mail:
     default-encoding: UTF-8
     host: smtp.mailtrap.io
@@ -57,9 +57,11 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-#  flyway:
-#    user: postgres
-#    password: Password@1
+  flyway:
+    enabled: true
+    schemas: bp
+    user: postgres
+    password: Password@1
 
   logging:
     level:
@@ -80,7 +82,9 @@ app:
       key-alias: chrisgyaspsec
       private-key-passphrase: Password@1
       bycriptStrength: 12
-      tokenExpirationAfterDays: 7
+      tokenExpirationAfterSeconds: 1440  #24 hours or 1 day
+      refresh-token-expires-after-seconds: 10080  #7 day
+      activation-token-expiration-after-seconds: 10080  #7 day
       tokenPrefix: 'Bearer '
       issuer: chrisgya
 

@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Data
 @MappedSuperclass
-public class AbstractEntity {
+public class SlimAbstractEntity {
     @Id
     @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +17,4 @@ public class AbstractEntity {
     @CreationTimestamp
     @Column(updatable = false)
     private Instant created;
-
-    @Column(name = "created_by", nullable = false, length = 50)
-    private String createdBy;
-
-    @Version
-    private long version;
 }

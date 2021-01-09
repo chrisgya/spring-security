@@ -7,7 +7,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -22,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,32 +29,37 @@ import java.util.Map;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender emailSender;
     private final SpringTemplateEngine templateEngine;
+    private final ExecutorService executorService;
 
 
     @Override
-    @Async
     public void sender(String templateName, String subject, String mailTo, Map<String, Object> thymeLeafProps, Map<String, String> fileAttachments, Map<String, ByteArrayInputStream> bisAttachments, MediaType mediaType) {
-        Mail mail = Mail.builder()
-                .from("chrisgya@gmail.com")
-                .mailTo(mailTo)
-                .subject(subject)
-                .fileAttachments(fileAttachments)
-                .bisAttachments(bisAttachments)
-                .thymeLeafProps(thymeLeafProps)
-                .mediaType(mediaType)
-                .build();
+        executorService.submit(() -> {
 
-        try {
-            sendEmail(mail, templateName);
-            System.out.println("********************** EMAIL SENT ********************************");
-        } catch (MessagingException e) {
-            System.out.println("********************** ERROR SENDING EMAIL ********************************");
-            e.printStackTrace();
-        }
+            Mail mail = Mail.builder()
+                    .from("chrisgya@gmail.com")
+                    .mailTo(mailTo)
+                    .subject(subject)
+                    .fileAttachments(fileAttachments)
+                    .bisAttachments(bisAttachments)
+                    .thymeLeafProps(thymeLeafProps)
+                    .mediaType(mediaType)
+                    .build();
+
+            try {
+                sendEmail(mail, templateName);
+                System.out.println("********************** EMAIL SENT ********************************");
+            } catch (MessagingException e) {
+                System.out.println("********************** ERROR SENDING EMAIL ********************************");
+                e.printStackTrace();
+            }
+
+        });
     }
 
 
     private void sendEmail(Mail mail, String templateName) throws MessagingException {
+
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
 
@@ -100,19 +105,21 @@ public class EmailServiceImpl implements EmailService {
 
     }
 
-    @Async
     @Override
     public void sender(String to, String subject, String body, ByteArrayInputStream bis, MediaType mediaType, String attachmentNameWithExtension) {
+        executorService.submit(() -> {
 
-        emailSender.send(mimeMessage -> {
-            var mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            mimeMessageHelper.setTo(to);
-            mimeMessageHelper.setSubject(subject);
-            mimeMessageHelper.setText(body, true);
+            emailSender.send(mimeMessage -> {
+                var mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+                mimeMessageHelper.setTo(to);
+                mimeMessageHelper.setSubject(subject);
+                mimeMessageHelper.setText(body, true);
 
-            DataSource attachment = new ByteArrayDataSource(bis, mediaType.toString());
+                DataSource attachment = new ByteArrayDataSource(bis, mediaType.toString());
 
-            mimeMessageHelper.addAttachment(attachmentNameWithExtension, attachment);
+                mimeMessageHelper.addAttachment(attachmentNameWithExtension, attachment);
+
+            });
 
         });
     }

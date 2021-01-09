@@ -14,11 +14,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions", schema = "bp")
 @BatchSize(size = 50)
 public class Permission extends AbstractEntity implements Serializable {
     @Column(name = "name",unique = true, nullable = false, length = 50)
     private String name;
     @Column(name = "description", length = 100)
     private String description;
+
+//    @OneToMany(mappedBy = "role_permissions", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private Set<RolePermissions> rolePermissions = new HashSet<>();
 }
