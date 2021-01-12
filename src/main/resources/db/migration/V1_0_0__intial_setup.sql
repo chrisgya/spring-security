@@ -39,6 +39,15 @@ CREATE TABLE IF NOT EXISTS bp.refresh_token(
     expiry_date TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
+CREATE SEQUENCE IF NOT EXISTS bp.forgotten_password_id_seq AS BIGINT;
+CREATE TABLE IF NOT EXISTS bp.forgotten_password(
+    id BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('bp.forgotten_password_id_seq'::regclass),
+    user_id BIGINT REFERENCES bp.users(id),
+    token TEXT NOT NULL UNIQUE,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    expiry_date TIMESTAMP WITHOUT TIME ZONE NOT NULL
+);
+
 
 CREATE SEQUENCE IF NOT EXISTS bp.roles_id_seq AS BIGINT;
 CREATE TABLE IF NOT EXISTS bp.roles

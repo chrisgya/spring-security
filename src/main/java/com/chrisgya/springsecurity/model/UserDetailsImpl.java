@@ -1,6 +1,7 @@
 package com.chrisgya.springsecurity.model;
 
 import com.chrisgya.springsecurity.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,11 +25,15 @@ public class UserDetailsImpl implements UserDetails {
     private String firstName;
     private String middleName;
     private String lastname;
-    //@JsonIgnore
+    @JsonIgnore
     private String password;
+    @JsonIgnore
     private boolean isLocked;
+    @JsonIgnore
     private Instant lockExpiryDate;
+    @JsonIgnore
     private boolean isEnabled;
+    @JsonIgnore
     private boolean isConfirmed;
     private String pictureUrl;
     private Instant lastUpdated;
@@ -84,21 +89,25 @@ public class UserDetailsImpl implements UserDetails {
         return username;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return isEnabled;

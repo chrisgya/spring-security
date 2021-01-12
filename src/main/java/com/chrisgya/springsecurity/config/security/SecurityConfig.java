@@ -89,4 +89,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(jwtProperties.getBycriptStrength());
     }
 
+    @Bean
+    public JwtHelper jwtHelper() {
+        return new JwtHelper();
+    }
 }

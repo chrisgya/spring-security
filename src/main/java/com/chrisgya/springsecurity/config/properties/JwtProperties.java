@@ -2,12 +2,16 @@ package com.chrisgya.springsecurity.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.http.HttpHeaders;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+@Validated
 @Data
+@ConstructorBinding
 @ConfigurationProperties(prefix = "app.security.jwt")
 public class JwtProperties {
     @NotBlank

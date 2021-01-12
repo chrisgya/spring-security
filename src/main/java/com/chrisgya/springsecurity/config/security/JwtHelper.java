@@ -1,55 +1,69 @@
 package com.chrisgya.springsecurity.config.security;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.chrisgya.springsecurity.config.properties.JwtProperties;
-import com.chrisgya.springsecurity.model.UserDetailsImpl;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Component;
+import com.chrisgya.springsecurity.exception.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
-@RequiredArgsConstructor
-@Slf4j
-@Component
 public class JwtHelper {
-private final JwtProperties jwtProperties;
-    private final RSAPrivateKey privateKey;
-    private final RSAPublicKey publicKey;
+    private static final String CLIENT_ID = "client_id";
+    private static final String CLIENT_NAME = "client_name";
+    private static final String TOKEN_JTI = "jti";
+    private static final String USERNAME = "user_name";
+    private static final String EMAIL = "email";
+    private static final String SCOPE = "scope";
 
-    public String createJwtForClaims(UserDetailsImpl userDetails) {
-
-        Map<String, String> claims = new HashMap<>();
-        claims.put("username", userDetails.getUsername());
-
-        List<String> authorities = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        claims.put("userId", String.valueOf(userDetails.getId()));
-        claims.put("firstName", userDetails.getFirstName());
-        claims.put("middleName", userDetails.getMiddleName());
-        claims.put("lastname", userDetails.getLastname());
-
-        JWTCreator.Builder jwtBuilder = JWT.create().withSubject(userDetails.getEmail()).withClaim("authorities", authorities);
-
-        // Add claims
-        claims.forEach(jwtBuilder::withClaim);
-
-        // Add expiredAt and etc
-        return jwtBuilder
-                .withJWTId(UUID.randomUUID().toString())
-                .withIssuer(jwtProperties.getIssuer())
-                .withNotBefore(new Date())
-                .withExpiresAt(Date.from(Instant.now().plusSeconds(jwtProperties.getTokenExpirationAfterSeconds())))
-                .sign(Algorithm.RSA256(publicKey, privateKey));
+    public String getClientId() {
+        return getClaim(CLIENT_ID);
     }
 
+    public String getClientName() {
+        return getClaim(CLIENT_NAME);
+    }
+
+    public String getTokenJti() {
+        return getClaim(TOKEN_JTI);
+    }
+
+    public String getUsername() {
+        return getClaim(USERNAME);
+    }
+
+    public String getUserEmail() {
+        return getClaim(EMAIL);
+    }
+
+    public String getTokenValue() {
+        return getJwt().getTokenValue();
+    }
+
+    public String getAccessToken() {
+        return "Bearer " + getJwt().getTokenValue();
+    }
+
+    public boolean hasScope(String scope) {
+        return getClaimAsList(SCOPE).stream().anyMatch(s -> s.equalsIgnoreCase(scope));
+    }
+
+    private String getClaim(String key) {
+        return getJwt().getClaimAsString(key);
+    }
+
+    private List<String> getClaimAsList(String key) {
+        List<String> claim = getJwt().getClaimAsStringList(key);
+        return Objects.nonNull(claim) ? claim : Collections.EMPTY_LIST;
+    }
+
+    private Jwt getJwt() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (Objects.nonNull(authentication) &&
+                authentication.getPrincipal() instanceof Jwt) {
+            return (Jwt) authentication.getPrincipal();
+        }
+        throw new AccessDeniedException("Invalid authentication - authentication must not be null and must have a JWT principal");
+    }
 }

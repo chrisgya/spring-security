@@ -1,8 +1,9 @@
 package com.chrisgya.springsecurity.controller;
 
 import com.chrisgya.springsecurity.config.properties.JwtProperties;
-import com.chrisgya.springsecurity.model.RegisterUserRequest;
+import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
 import com.chrisgya.springsecurity.model.request.LoginRequest;
+import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
 import com.chrisgya.springsecurity.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,10 +43,22 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/verify-account/{token}")
-    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/verify-account/{token}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void verifyAccount(@PathVariable String token) {
         userService.verifyAccount(token);
+    }
+
+    @PutMapping("/forgotten-password/{email}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void forgottenPassword(@PathVariable String email) {
+        userService.forgottenPassword(email);
+    }
+
+    @PutMapping("/reset-password/{token}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resetPassword(@PathVariable String token, @Valid @RequestBody ResetPasswordRequest req) {
+        userService.resetPassword(token, req);
     }
 
 }

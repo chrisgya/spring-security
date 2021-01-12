@@ -1,11 +1,10 @@
 package com.chrisgya.springsecurity.service;
 
 import com.chrisgya.springsecurity.entity.User;
-import com.chrisgya.springsecurity.model.AuthenticationResponse;
-import com.chrisgya.springsecurity.model.RegisterUserRequest;
-import com.chrisgya.springsecurity.model.UserPage;
-import com.chrisgya.springsecurity.model.UserParameters;
+import com.chrisgya.springsecurity.model.*;
 import com.chrisgya.springsecurity.model.request.LoginRequest;
+import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
+import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -19,7 +18,13 @@ public interface UserService {
 
     void verifyAccount(String token);
 
-    User getCurrentUser();
+    void forgottenPassword(String email);
+
+    void resetPassword(String token, ResetPasswordRequest req);
+
+    void changePassword(ResetPasswordRequest req);
+
+    UserDetailsImpl getCurrentUser();
 
     User getUser(Long id);
 

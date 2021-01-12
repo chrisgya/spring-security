@@ -1,5 +1,4 @@
 server:
-  port: 8080
   servlet:
     context-path: /security
   shutdown: graceful
@@ -9,18 +8,11 @@ spring:
     name: spring-jwt-security
   lifecycle:
     timeout-per-shutdown-phase: 30s
-  datasource:
-    hikari:
-      connectionTimeout: 20000
-      maximumPoolSize: 5
-    name: jpa-pg-datasource
-    url: 'jdbc:postgresql://localhost:5432/spring_security_db'
-    username: postgres
-    password: Password@1
   jpa:
     show-sql: true
     properties:
       hibernate:
+        default-schema: bp
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     hibernate:

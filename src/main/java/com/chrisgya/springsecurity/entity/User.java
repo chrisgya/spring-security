@@ -16,12 +16,16 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity
-@Table(name = "users", schema = "bp")
+@Entity(name = "User")
+@Table(name = "users", schema = "bp",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "users_username_unique", columnNames = "username"),
+                @UniqueConstraint(name = "users_email_unique", columnNames = "email")
+        })
 public class User extends AbstractEntity implements Serializable {
-    @Column(name = "username",unique = true, nullable = false, length = 50)
+    @Column(name = "username", nullable = false, length = 50)
     private String username;
-    @Column(name = "email",unique = true, nullable = false, length = 75)
+    @Column(name = "email", nullable = false, length = 75)
     private String email;
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
@@ -29,7 +33,7 @@ public class User extends AbstractEntity implements Serializable {
     private String middleName;
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
-    @Column(name = "picture_url")
+    @Column(name = "picture_url", columnDefinition = "TEXT")
     private String pictureUrl;
     @Column(name = "password", nullable = false, length = 1000)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -51,7 +55,7 @@ public class User extends AbstractEntity implements Serializable {
 //            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false, updatable = false)})
 //    private Set<Role> roles = new HashSet<>();
 
-//
+    //
 //
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserRoles> userRoles = new HashSet<>();

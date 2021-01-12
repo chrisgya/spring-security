@@ -1,16 +1,17 @@
 package com.chrisgya.springsecurity.service;
 
+import com.chrisgya.springsecurity.config.properties.FrontEndUrlProperties;
 import com.chrisgya.springsecurity.config.properties.JwtProperties;
-import com.chrisgya.springsecurity.config.security.JwtHelper;
-import com.chrisgya.springsecurity.controller.AuthController;
-import com.chrisgya.springsecurity.entity.RefreshToken;
-import com.chrisgya.springsecurity.entity.User;
-import com.chrisgya.springsecurity.entity.UserRoles;
-import com.chrisgya.springsecurity.entity.UserVerification;
+import com.chrisgya.springsecurity.config.properties.MailSubjectProperties;
+import com.chrisgya.springsecurity.config.properties.MailTemplateProperties;
+import com.chrisgya.springsecurity.config.security.TokenCreator;
+import com.chrisgya.springsecurity.entity.*;
 import com.chrisgya.springsecurity.exception.BadRequestException;
 import com.chrisgya.springsecurity.exception.NotFoundException;
 import com.chrisgya.springsecurity.model.*;
 import com.chrisgya.springsecurity.model.request.LoginRequest;
+import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
+import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
 import com.chrisgya.springsecurity.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,12 +28,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.*;
 
 @RequiredArgsConstructor
 @Service
@@ -41,13 +43,17 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserVerificationRepository userVerificationRepository;
+    private final ForgottenPasswordRepository forgottenPasswordRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtHelper jwtHelper;
+    private final TokenCreator tokenCreator;
     private final JwtProperties jwtProperties;
     private final ModelMapper modelMapper;
     private final UserDetailsService userDetailsService;
     private final EmailService emailService;
+    private final MailTemplateProperties mailTemplateProperties;
+    private final MailSubjectProperties mailSubjectProperties;
+    private final FrontEndUrlProperties frontEndUrlProperties;
 
 
     @Override
@@ -61,18 +67,18 @@ public class UserServiceImpl implements UserService {
             var userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
             if (!userDetails.isConfirmed()) {
-                throw new BadRequestException("please confirm your email");
+                throw new BadRequestException(CONFIRM_EMAIL);
             }
 
             if (userDetails.isLocked() && userDetails.getLockExpiryDate().isBefore(Instant.now())) {
-                throw new BadRequestException(String.format("account is locked. account would be available on %s", userDetails.getLockExpiryDate()));
+                throw new BadRequestException(String.format(ACCOUNT_LOCKED, userDetails.getLockExpiryDate()));
             }
             if (!userDetails.isEnabled()) {
-                throw new BadRequestException("account is disabled. please contact support team for assistance");
+                throw new BadRequestException(ACCOUNT_DISABLED);
             }
 
             return AuthenticationResponse.builder()
-                    .accessToken(jwtHelper.createJwtForClaims(userDetails))
+                    .accessToken(tokenCreator.createJwtForClaims(userDetails))
                     .refreshToken(generateRefreshToken(modelMapper.map(userDetails, User.class)).getToken())
                     .build();
 
@@ -87,7 +93,7 @@ public class UserServiceImpl implements UserService {
         var userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(result.getUser().getEmail());
 
         return AuthenticationResponse.builder()
-                .accessToken(jwtHelper.createJwtForClaims(userDetails))
+                .accessToken(tokenCreator.createJwtForClaims(userDetails))
                 .refreshToken(generateRefreshToken(modelMapper.map(userDetails, User.class)).getToken())
                 .build();
     }
@@ -98,11 +104,11 @@ public class UserServiceImpl implements UserService {
     public User registerUser(RegisterUserRequest req) {
 
         if (userRepository.existsByUsername(req.getUsername())) {
-            throw new BadRequestException("Username is already taken!");
+            throw new BadRequestException(String.format(ALREADY_TAKEN, "username"));
         }
 
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new BadRequestException("Email is already in use!");
+            throw new BadRequestException(String.format(ALREADY_TAKEN, "email"));
         }
 
         var user = User.builder()
@@ -130,9 +136,14 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         String token = generateVerificationToken(user);
-        var confirmationLink = MvcUriComponentsBuilder
-                .fromMethodName(AuthController.class, "verifyAccount", token)
-                .build().toString();
+
+        //NB: change server-side link to front-end link
+//        var confirmationLink = MvcUriComponentsBuilder
+//                .fromMethodName(AuthController.class, "verifyAccount", token)
+//                .build().toString();
+
+        //front-end link
+         var confirmationLink = frontEndUrlProperties.getConfirmAccount() + token;
 
         sendConfirmationLink(user, confirmationLink);
 
@@ -140,14 +151,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private void sendConfirmationLink(User user, String url) {
-        var subject = "Account confirmation on Chrisgya Site";
-
         Map<String, Object> thymeLeafProps = new HashMap<>();
         thymeLeafProps.put("name", user.getFirstName());
         thymeLeafProps.put("url", url);
 
-        emailService.sender("account-confirmation-template", subject, user.getEmail(), thymeLeafProps, null, null, null);
+        emailService.sender(mailTemplateProperties.getConfirmAccount(), mailSubjectProperties.getConfirmAccount(), user.getEmail(), thymeLeafProps, null, null, null);
     }
+
 
     @Transactional
     @Override
@@ -167,24 +177,73 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getCurrentUser() {
-        var principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
-                getContext().getAuthentication().getPrincipal();
-        return userRepository.findByUsername(principal.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
+    public void forgottenPassword(String email) {
+        var user = userRepository.findByEmail(email);
+        if (!user.isPresent()) {
+            return;
+        }
+        var forgottenPassword = new ForgottenPassword(user.get(), UUID.randomUUID().toString(), Instant.now().plusSeconds(jwtProperties.getActivationTokenExpirationAfterSeconds()));
+        forgottenPasswordRepository.save(forgottenPassword);
+
+        sendResetPasswordLink(user.get(), frontEndUrlProperties.getResetPassword() + forgottenPassword.getToken());
+    }
+
+    private void sendResetPasswordLink(User user, String url) {
+        Map<String, Object> thymeLeafProps = new HashMap<>();
+        thymeLeafProps.put("name", user.getFirstName());
+        thymeLeafProps.put("url", url);
+
+        emailService.sender(mailTemplateProperties.getResetPassword(), mailSubjectProperties.getResetPassword(), user.getEmail(), thymeLeafProps, null, null, null);
+    }
+
+    @Transactional
+    @Override
+    public void resetPassword(String token, ResetPasswordRequest req) {
+        var forgottenPassword = forgottenPasswordRepository.findByToken(token)
+                .orElseThrow(() -> new BadRequestException(INVALID_TOKEN));
+
+        if (forgottenPassword.getExpiryDate().isBefore(Instant.now())) {
+            new BadRequestException(EXPIRED_TOKEN);
+        }
+
+        var user = userRepository.findById(forgottenPassword.getUser().getId())
+                .orElseThrow(() -> new BadRequestException(INVALID_USER_TOKEN));
+
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        userRepository.save(user);
+
+        forgottenPasswordRepository.delete(forgottenPassword);
+    }
+
+    @Override
+    public void changePassword(ResetPasswordRequest req) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        var user = userRepository.findByEmail(authentication.getPrincipal().toString())
+                .orElseThrow(() -> new BadRequestException(String.format(NOT_FOUND, "user")));
+
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        userRepository.save(user);
+    }
+
+
+    @Override
+    public UserDetailsImpl getCurrentUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (UserDetailsImpl) userDetailsService.loadUserByUsername(authentication.getPrincipal().toString());
     }
 
 
     @Override
     public User getUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("no user found"));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND, "user")));
     }
 
     @Override
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("no user found"));
+                .orElseThrow(() -> new UsernameNotFoundException(String.format(NOT_FOUND, "user")));
     }
 
     @Override
@@ -241,9 +300,9 @@ public class UserServiceImpl implements UserService {
 
     private RefreshToken validateRefreshToken(String token) {
         var refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new BadRequestException("invalid refresh token"));
+                .orElseThrow(() -> new BadRequestException(INVALID_REFRESH_TOKEN));
         if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
-            throw new BadRequestException("refresh token has expired");
+            throw new BadRequestException(EXPIRED_REFRESH_TOKEN);
         }
 
         refreshTokenRepository.delete(refreshToken);

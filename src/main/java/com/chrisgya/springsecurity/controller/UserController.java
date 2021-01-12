@@ -1,6 +1,8 @@
 package com.chrisgya.springsecurity.controller;
 
 import com.chrisgya.springsecurity.entity.User;
+import com.chrisgya.springsecurity.model.UserDetailsImpl;
+import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
 import com.chrisgya.springsecurity.service.EmailService;
 import com.chrisgya.springsecurity.service.ExcelFileExporter;
 import com.chrisgya.springsecurity.service.PdfService;
@@ -10,15 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +39,17 @@ public class UserController {
     private final EmailService emailService;
     private final PdfService pdfService;
 
+    @GetMapping("me")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDetailsImpl getCurrentUser() {
+        return userService.getCurrentUser();
+    }
+
+    @PostMapping("change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(@Valid @RequestBody ResetPasswordRequest req) {
+         userService.changePassword(req);
+    }
 
     // http://localhost:8080/security/api/v1/users/export-pdf/1
     @GetMapping(value = "/export-pdf/{id}", produces = MediaType.APPLICATION_PDF_VALUE)
@@ -48,8 +60,8 @@ public class UserController {
         var headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_" + user.getUsername() + ".pdf"); //inline or attachment
 
-        sendEmail(user, bis, MediaType.APPLICATION_PDF,"users_report.pdf");
-        sendEmailWithHtmlTemplate(user, bis, MediaType.APPLICATION_PDF,"users_report.pdf");
+        sendEmail(user, bis, MediaType.APPLICATION_PDF, "users_report.pdf");
+        sendEmailWithHtmlTemplate(user, bis, MediaType.APPLICATION_PDF, "users_report.pdf");
 
         return ResponseEntity.ok()
                 .headers(headers)
@@ -68,7 +80,7 @@ public class UserController {
             if (Files.exists(filePath)) {
                 //send email
                 var bis = retrieveByteArrayInputStream(file);
-                sendEmail(user, bis, MediaType.APPLICATION_PDF,"users_report.pdf");
+                sendEmail(user, bis, MediaType.APPLICATION_PDF, "users_report.pdf");
                 sendEmailWithHtmlTemplate(user, bis, MediaType.APPLICATION_PDF, "users_report.pdf");
 
                 //export pdf
@@ -89,8 +101,8 @@ public class UserController {
         var columns = new String[]{"First Name", "Last Name", "User Name", "Email"};
         var users = userService.getUsers();
         var stream = ExcelFileExporter.contactListToExcelFile(columns, users);
-       // sendEmailWithHtmlTemplate(users.get(0), stream, MediaType.APPLICATION_OCTET_STREAM, "users_report.xlsx");
-        sendEmail(users.get(0), stream, MediaType.APPLICATION_OCTET_STREAM,"users_report.xlsx");
+        // sendEmailWithHtmlTemplate(users.get(0), stream, MediaType.APPLICATION_OCTET_STREAM, "users_report.xlsx");
+        sendEmail(users.get(0), stream, MediaType.APPLICATION_OCTET_STREAM, "users_report.xlsx");
 
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=users.xlsx");
@@ -103,7 +115,7 @@ public class UserController {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; file=user.csv");
         var users = userService.getUsers();
-        ExcelFileExporter.downloadCsv(response.getWriter(), users) ;
+        ExcelFileExporter.downloadCsv(response.getWriter(), users);
     }
 
     private void sendEmail(User user, ByteArrayInputStream bis, MediaType mediaType, String attachmentName) {
@@ -122,7 +134,7 @@ public class UserController {
         thymeLeafProps.put("body", body);
 
         Map<String, ByteArrayInputStream> bisAttachments = new HashMap<>();
-        bisAttachments.put(attachmentName , bis);
+        bisAttachments.put(attachmentName, bis);
         emailService.sender("base-email-template", subject, user.getEmail(), thymeLeafProps, null, bisAttachments, mediaType);
 
     }

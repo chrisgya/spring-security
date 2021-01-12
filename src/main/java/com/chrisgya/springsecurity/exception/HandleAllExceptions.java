@@ -13,13 +13,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
+import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.PASSWORD_MISMATCH;
 
 @Slf4j
 @ControllerAdvice
 public class HandleAllExceptions extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public final ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e, WebRequest req) {
+        var response = new ErrorMessage(HttpStatus.FORBIDDEN.value(), new Date(), e.getMessage(), req.getDescription(false));
+        return new ResponseEntity(response, HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(BadRequestException.class)
     public final ResponseEntity<?> handleBadRequestException(BadRequestException e, WebRequest req) {
@@ -39,14 +51,35 @@ public class HandleAllExceptions extends ResponseEntityExceptionHandler {
         return new ResponseEntity(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public final ResponseEntity<?> ConstraintViolationException(ConstraintViolationException e) {
+        Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
+
+        List<ValidationError> errors = new ArrayList<>();
+        constraintViolations.stream()
+                .forEach(constraintViolation -> {
+                    String fieldName = null;
+                    for (Path.Node node : constraintViolation.getPropertyPath()) {
+                        fieldName = node.getName();
+                    }
+                    errors.add(new ValidationError(fieldName, constraintViolation.getMessage()));
+                });
+
+        return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
+    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         List<ValidationError> errors = new ArrayList<>();
 
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
+            String fieldName;
+            if (errorMessage.equals(PASSWORD_MISMATCH)) {
+                fieldName = "confirmPassword";
+            } else {
+                fieldName = ((FieldError) error).getField();
+            }
             errors.add(new ValidationError(fieldName, errorMessage));
         });
 
