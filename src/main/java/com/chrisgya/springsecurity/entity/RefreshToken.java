@@ -20,8 +20,7 @@ public class RefreshToken extends SlimAbstractEntity implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Lob
-    @Column(name = "token")
+    @Column(name = "token", columnDefinition = "Text")
     private String token;
 
     @Column(name = "expiry_date", nullable = false)

@@ -16,6 +16,8 @@ public interface UserService {
 
     User registerUser(RegisterUserRequest req);
 
+    void requestConfirmationLink(String email);
+
     void verifyAccount(String token);
 
     void forgottenPassword(String email);

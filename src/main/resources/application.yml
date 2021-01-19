@@ -24,7 +24,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     hibernate:
-      ddl-auto: create-drop # Hibernate ddl auto (create, create-drop, validate, update)
+      ddl-auto: update # Hibernate ddl auto (create, create-drop, validate, update)
   servlet:
     multipart:
       max-file-size: 1MB
@@ -108,5 +108,6 @@ custom-thread:
   queue-capacity: 100
 
 front-end-url:
-  confirm-account: http://localhost:3000/confirm-account/
+  base-url: http://localhost:3000
+  confirm-account: http://localhost:3000/verify-account/
   reset-password: http://localhost:3000/reset-password/

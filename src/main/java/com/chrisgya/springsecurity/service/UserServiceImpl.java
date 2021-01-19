@@ -25,7 +25,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             var authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
+                    new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             var userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -116,7 +115,7 @@ public class UserServiceImpl implements UserService {
                 .email(req.getEmail())
                 .firstName(req.getFirstName())
                 .middleName(req.getMiddleName())
-                .lastName(req.getLastname())
+                .lastName(req.getLastName())
                 .password(passwordEncoder.encode(req.getPassword()))
                 .isEnabled(true)
                 .build();
@@ -143,11 +142,24 @@ public class UserServiceImpl implements UserService {
 //                .build().toString();
 
         //front-end link
-         var confirmationLink = frontEndUrlProperties.getConfirmAccount() + token;
+        var confirmationLink = frontEndUrlProperties.getConfirmAccount() + token;
 
         sendConfirmationLink(user, confirmationLink);
 
         return user;
+    }
+
+    @Override
+    public void requestConfirmationLink(String email) {
+
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(()->new NotFoundException(String.format(NOT_FOUND, "user")));
+
+        var token = generateVerificationToken(user);
+
+        var confirmationLink = frontEndUrlProperties.getConfirmAccount() + token;
+
+        sendConfirmationLink(user, confirmationLink);
     }
 
     private void sendConfirmationLink(User user, String url) {
@@ -220,7 +232,7 @@ public class UserServiceImpl implements UserService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         var user = userRepository.findByEmail(authentication.getPrincipal().toString())
-                .orElseThrow(() -> new BadRequestException(String.format(NOT_FOUND, "user")));
+                .orElseThrow(() ->  new NotFoundException(String.format(NOT_FOUND, "user")));
 
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         userRepository.save(user);
@@ -243,7 +255,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(NOT_FOUND, "user")));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND, "user")));
     }
 
     @Override
@@ -289,13 +301,22 @@ public class UserServiceImpl implements UserService {
     }
 
     private RefreshToken generateRefreshToken(User user) {
-        var refreshToken = RefreshToken.builder()
+        var req = RefreshToken.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusSeconds(jwtProperties.getRefreshTokenExpiresAfterSeconds()))
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        var refreshToken = refreshTokenRepository.findByUser(user);
+        if (refreshToken.isPresent()) {
+            var update = refreshToken.get();
+            update.setUser(req.getUser());
+            update.setToken(req.getToken());
+            update.setExpiryDate(req.getExpiryDate());
+            return refreshTokenRepository.save(update);
+        }
+
+        return refreshTokenRepository.save(req);
     }
 
     private RefreshToken validateRefreshToken(String token) {

@@ -16,4 +16,6 @@ public class FrontEndUrlProperties {
     private final String confirmAccount;
     @NotBlank
     private final String resetPassword;
+    @NotBlank
+    private final String baseUrl;
 }
