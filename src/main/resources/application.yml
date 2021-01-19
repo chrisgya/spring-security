@@ -71,13 +71,6 @@ management:
     user: postgres
     password: Password@1
 
-  logging:
-    level:
-      org:
-        springframework: DEBUG
-    pattern:
-      console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
-
   file:
     directory: C://temp/${spring.application.name}
     image-extensions: jpg, jpeg, png
@@ -95,12 +88,6 @@ app:
       activation-token-expiration-after-seconds: 10080  #7 day
       tokenPrefix: 'Bearer '
       issuer: chrisgya
-
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
 
 custom-thread:
   core-pool-size: 4

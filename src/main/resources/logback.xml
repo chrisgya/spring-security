@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.chrisgya.springsecurity.interceptor.MaskingPatternLayout">
+                <patternsProperty>
+                    (?:firstName|Password|password|Authorization|oldPassword|confirmPassword|currentPassword|newPassword|client_secret)=(?:'|"|)([a-zA-Z0-9^%#'"~@#$^*_+\- ]+)(?:'|"|)
+                </patternsProperty>
+                <pattern>%d [%thread] %-5level %logger{35} - %msg%n</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/api.log</file>
+        <append>true</append>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+        <layout class="com.chrisgya.springsecurity.interceptor.MaskingPatternLayout">
+            <patternsProperty>
+                (?:firstName|Password|password|Authorization|oldPassword|confirmPassword|currentPassword|newPassword|client_secret)=(?:'|"|)([a-zA-Z0-9^%#'"~@#$^*_+\- ]+)(?:'|"|)
+            </patternsProperty>
+            <pattern>%d [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </layout>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>logs/api.%i.log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>13</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
