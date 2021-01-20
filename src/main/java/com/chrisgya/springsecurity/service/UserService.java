@@ -1,7 +1,11 @@
 package com.chrisgya.springsecurity.service;
 
 import com.chrisgya.springsecurity.entity.User;
-import com.chrisgya.springsecurity.model.*;
+import com.chrisgya.springsecurity.model.AuthenticationResponse;
+import com.chrisgya.springsecurity.model.UserDetailsImpl;
+import com.chrisgya.springsecurity.model.UserPage;
+import com.chrisgya.springsecurity.model.UserParameters;
+import com.chrisgya.springsecurity.model.request.ChangePasswordRequest;
 import com.chrisgya.springsecurity.model.request.LoginRequest;
 import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
 import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
@@ -24,7 +28,7 @@ public interface UserService {
 
     void resetPassword(String token, ResetPasswordRequest req);
 
-    void changePassword(ResetPasswordRequest req);
+    void changePassword(ChangePasswordRequest req);
 
     UserDetailsImpl getCurrentUser();
 

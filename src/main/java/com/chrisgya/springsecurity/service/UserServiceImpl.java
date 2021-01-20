@@ -9,6 +9,7 @@ import com.chrisgya.springsecurity.entity.*;
 import com.chrisgya.springsecurity.exception.BadRequestException;
 import com.chrisgya.springsecurity.exception.NotFoundException;
 import com.chrisgya.springsecurity.model.*;
+import com.chrisgya.springsecurity.model.request.ChangePasswordRequest;
 import com.chrisgya.springsecurity.model.request.LoginRequest;
 import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
 import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
@@ -228,13 +229,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(ResetPasswordRequest req) {
+    public void changePassword(ChangePasswordRequest req) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         var user = userRepository.findByEmail(authentication.getPrincipal().toString())
                 .orElseThrow(() ->  new NotFoundException(String.format(NOT_FOUND, "user")));
 
-        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), req.getPassword()));
+
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
         userRepository.save(user);
     }
 

@@ -2,7 +2,7 @@ package com.chrisgya.springsecurity.controller;
 
 import com.chrisgya.springsecurity.entity.User;
 import com.chrisgya.springsecurity.model.UserDetailsImpl;
-import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
+import com.chrisgya.springsecurity.model.request.ChangePasswordRequest;
 import com.chrisgya.springsecurity.service.EmailService;
 import com.chrisgya.springsecurity.service.ExcelFileExporter;
 import com.chrisgya.springsecurity.service.PdfService;
@@ -47,7 +47,7 @@ public class UserController {
 
     @PostMapping("change-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@Valid @RequestBody ResetPasswordRequest req) {
+    public void changePassword(@Valid @RequestBody ChangePasswordRequest req) {
          userService.changePassword(req);
     }
 
