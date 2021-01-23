@@ -5,6 +5,8 @@ server:
   shutdown: graceful
 
 spring:
+  main:
+    banner-mode: off
   application:
     name: spring-jwt-security
   lifecycle:
@@ -29,8 +31,11 @@ spring:
     multipart:
       max-file-size: 1MB
       max-request-size: 10MB
-  main:
-    banner-mode: off
+  flyway:
+    enabled: false
+    schemas: bp
+    user: postgres
+    password: Password@1
   mail:
     default-encoding: UTF-8
     host: smtp.mailtrap.io
@@ -65,15 +70,12 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-  flyway:
-    enabled: false
-    schemas: bp
-    user: postgres
-    password: Password@1
 
-  file:
-    directory: C://temp/${spring.application.name}
-    image-extensions: jpg, jpeg, png
+file:
+  directory: C://temp/${spring.application.name}
+  image-extensions: jpg, jpeg, png
+  file-extensions: pdf, csv
+  max-image-size: 204
 
 app:
   security:
@@ -98,3 +100,5 @@ front-end-url:
   base-url: http://localhost:3000
   confirm-account: http://localhost:3000/verify-account/
   reset-password: http://localhost:3000/reset-password/
+
+public-paths: /api/v1/auth/**, /api/v1/users/**

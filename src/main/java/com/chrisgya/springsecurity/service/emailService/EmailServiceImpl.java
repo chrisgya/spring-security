@@ -1,4 +1,4 @@
-package com.chrisgya.springsecurity.service;
+package com.chrisgya.springsecurity.service.emailService;
 
 import com.chrisgya.springsecurity.model.Mail;
 import lombok.RequiredArgsConstructor;

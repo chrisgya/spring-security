@@ -1,20 +1,21 @@
-package com.chrisgya.springsecurity.service;
+package com.chrisgya.springsecurity.service.userService;
 
 import com.chrisgya.springsecurity.config.properties.FrontEndUrlProperties;
 import com.chrisgya.springsecurity.config.properties.JwtProperties;
 import com.chrisgya.springsecurity.config.properties.MailSubjectProperties;
 import com.chrisgya.springsecurity.config.properties.MailTemplateProperties;
 import com.chrisgya.springsecurity.config.security.TokenCreator;
+import com.chrisgya.springsecurity.dao.UserDao;
 import com.chrisgya.springsecurity.entity.*;
 import com.chrisgya.springsecurity.exception.BadRequestException;
 import com.chrisgya.springsecurity.exception.NotFoundException;
 import com.chrisgya.springsecurity.model.*;
-import com.chrisgya.springsecurity.model.request.ChangePasswordRequest;
-import com.chrisgya.springsecurity.model.request.LoginRequest;
-import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
-import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
+import com.chrisgya.springsecurity.model.request.*;
 import com.chrisgya.springsecurity.repository.*;
+import com.chrisgya.springsecurity.service.emailService.EmailService;
+import com.chrisgya.springsecurity.service.fileStorage.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -54,10 +56,15 @@ public class UserServiceImpl implements UserService {
     private final MailTemplateProperties mailTemplateProperties;
     private final MailSubjectProperties mailSubjectProperties;
     private final FrontEndUrlProperties frontEndUrlProperties;
-
+    private final FileStorageService fileStorageService;
+    private final UserRolesRepository userRolesRepository;
+    private final UserDao userDao;
 
     @Override
     public AuthenticationResponse login(LoginRequest req) {
+        log.info("**************************************    BEGIN   *********************************************");
+        log.info("LoginRequest: {}", req);
+        log.info("**************************************    BEGIN   *********************************************");
 
         try {
             var authentication = authenticationManager.authenticate(
@@ -70,8 +77,8 @@ public class UserServiceImpl implements UserService {
                 throw new BadRequestException(CONFIRM_EMAIL);
             }
 
-            if (userDetails.isLocked() && userDetails.getLockExpiryDate().isBefore(Instant.now())) {
-                throw new BadRequestException(String.format(ACCOUNT_LOCKED, userDetails.getLockExpiryDate()));
+            if (userDetails.isLocked() && userDetails.getLockExpiredAt().isBefore(Instant.now())) {
+                throw new BadRequestException(String.format(ACCOUNT_LOCKED, userDetails.getLockExpiredAt()));
             }
             if (!userDetails.isEnabled()) {
                 throw new BadRequestException(ACCOUNT_DISABLED);
@@ -118,7 +125,7 @@ public class UserServiceImpl implements UserService {
                 .middleName(req.getMiddleName())
                 .lastName(req.getLastName())
                 .password(passwordEncoder.encode(req.getPassword()))
-                .isEnabled(true)
+                .enabled(true)
                 .build();
         user.setCreatedBy(req.getEmail());
 
@@ -154,7 +161,7 @@ public class UserServiceImpl implements UserService {
     public void requestConfirmationLink(String email) {
 
         var user = userRepository.findByEmail(email)
-                .orElseThrow(()->new NotFoundException(String.format(NOT_FOUND, "user")));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND, "user")));
 
         var token = generateVerificationToken(user);
 
@@ -178,7 +185,7 @@ public class UserServiceImpl implements UserService {
         var verificationToken = userVerificationRepository.findByToken(token)
                 .orElseThrow(() -> new NotFoundException("invalid token"));
 
-        if (verificationToken.getExpiryDate().isBefore(Instant.now())) {
+        if (verificationToken.getExpiredAt().isBefore(Instant.now())) {
             throw new BadRequestException("invalid token");
         }
 
@@ -215,7 +222,7 @@ public class UserServiceImpl implements UserService {
         var forgottenPassword = forgottenPasswordRepository.findByToken(token)
                 .orElseThrow(() -> new BadRequestException(INVALID_TOKEN));
 
-        if (forgottenPassword.getExpiryDate().isBefore(Instant.now())) {
+        if (forgottenPassword.getExpiredAt().isBefore(Instant.now())) {
             new BadRequestException(EXPIRED_TOKEN);
         }
 
@@ -233,7 +240,7 @@ public class UserServiceImpl implements UserService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         var user = userRepository.findByEmail(authentication.getPrincipal().toString())
-                .orElseThrow(() ->  new NotFoundException(String.format(NOT_FOUND, "user")));
+                .orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND, "user")));
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), req.getPassword()));
 
@@ -267,10 +274,9 @@ public class UserServiceImpl implements UserService {
         Specification emailSpec = UserSpecification.userEmailEquals(params.getUsersEmail());
         Specification firstNameSpec = UserSpecification.userFirstnameEquals(params.getUsersFirstName());
         Specification lastNameSpec = UserSpecification.userLastnameEquals(params.getUsersLastName());
-        Specification isLockedSpec = UserSpecification.userIsLockedEquals(params.getUsersIsLocked());
-        Specification isEnabledSpec = UserSpecification.userIsEnabledEquals(params.getUsersIsEnabled());
-        Specification isConfirmedSpec = UserSpecification.userIsConfirmedEquals(params.getUsersIsConfirmed());
-        Specification isDeletedSpec = UserSpecification.userIsConfirmedEquals(params.getUsersIsDeleted());
+        Specification isLockedSpec = UserSpecification.userIsLockedEquals(params.getUsersLocked());
+        Specification isEnabledSpec = UserSpecification.userIsEnabledEquals(params.getUsersEnabled());
+        Specification isConfirmedSpec = UserSpecification.userIsConfirmedEquals(params.getUsersConfirmed());
 
         Specification spec = Specification.where(usernameSpec)
                 .or(emailSpec)
@@ -278,8 +284,7 @@ public class UserServiceImpl implements UserService {
                 .or(lastNameSpec)
                 .or(isLockedSpec)
                 .or(isEnabledSpec)
-                .or(isConfirmedSpec)
-                .or(isDeletedSpec);
+                .or(isConfirmedSpec);
 
         Sort sort = Sort.by(userPage.getSortDirection(), userPage.getSortBy());
         Pageable pageable = PageRequest.of(userPage.getPageNumber(), userPage.getPageSize(), sort);
@@ -287,8 +292,102 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<User> searchUsers(String text, UserPage userPage) {
+        Pageable pageable = PageRequest.of(userPage.getPageNumber(), userPage.getPageSize());
+        return userRepository.searchUsers(text, pageable);
+    }
+
+    @Override
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    @Transactional
+    @Override
+    public void changeEmail(ChangeEmailRequest req) {
+        if (userRepository.existsByEmail(req.getEmail())) {
+            throw new BadRequestException(String.format(ALREADY_TAKEN, "email"));
+        }
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var user = getUserByEmail(authentication.getPrincipal().toString());
+        user.setEmail(req.getEmail());
+        user.setConfirmed(false);
+        userRepository.save(user);
+
+        var token = generateVerificationToken(user);
+        var confirmationLink = frontEndUrlProperties.getConfirmAccount() + token;
+        sendConfirmationLink(user, confirmationLink);
+    }
+
+    @Override
+    public void updateUser(UpdateUserRequest req) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var user = getUserByEmail(authentication.getPrincipal().toString());
+        user.setFirstName(req.getFirstName());
+        user.setMiddleName(req.getMiddleName());
+        user.setLastName(req.getLastName());
+
+        if (req.getPicture() != null) {
+            var storedFileResponse = fileStorageService.storeFile(req.getPicture(), true, null);
+            user.setPictureUrl(storedFileResponse.getPath());
+            log.info("storedFileResponse: {}", storedFileResponse);
+        }
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public List<Role> getUserRoles(Long id) {
+        var user = getUser(id);
+        return userRolesRepository.findUserRolesByUser(user)
+                .stream().map(userRoles -> userRoles.getRole())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void lockUser(Long id) {
+        var user = getUser(id);
+        if (user.isLocked()) {
+            throw new BadRequestException("user already locked");
+        }
+        user.setLocked(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unLockUser(Long id) {
+        var user = getUser(id);
+        if (!user.isLocked()) {
+            throw new BadRequestException("user is not locked");
+        }
+        user.setLocked(false);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void enableUser(Long id) {
+        var user = getUser(id);
+        if (user.isEnabled()) {
+            throw new BadRequestException("user already enabled");
+        }
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void disableUser(Long id) {
+        var user = getUser(id);
+        if (!user.isEnabled()) {
+            throw new BadRequestException("user is already disabled");
+        }
+        user.setEnabled(false);
+        userRepository.save(user);
+    }
+
+    @Override
+    public List<Permission> getUserPermissions(Long id) {
+        return userDao.findUserPermissions(id);
     }
 
     private String generateVerificationToken(User user) {
@@ -296,7 +395,7 @@ public class UserServiceImpl implements UserService {
         var verificationToken = UserVerification.builder()
                 .token(token)
                 .user(user)
-                .expiryDate(Instant.now().plusSeconds(jwtProperties.getActivationTokenExpirationAfterSeconds()))
+                .expiredAt(Instant.now().plusSeconds(jwtProperties.getActivationTokenExpirationAfterSeconds()))
                 .build();
 
         userVerificationRepository.save(verificationToken);
@@ -307,7 +406,7 @@ public class UserServiceImpl implements UserService {
         var req = RefreshToken.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())
-                .expiryDate(Instant.now().plusSeconds(jwtProperties.getRefreshTokenExpiresAfterSeconds()))
+                .expiredAt(Instant.now().plusSeconds(jwtProperties.getRefreshTokenExpiresAfterSeconds()))
                 .build();
 
         var refreshToken = refreshTokenRepository.findByUser(user);
@@ -315,7 +414,7 @@ public class UserServiceImpl implements UserService {
             var update = refreshToken.get();
             update.setUser(req.getUser());
             update.setToken(req.getToken());
-            update.setExpiryDate(req.getExpiryDate());
+            update.setExpiredAt(req.getExpiredAt());
             return refreshTokenRepository.save(update);
         }
 
@@ -325,7 +424,7 @@ public class UserServiceImpl implements UserService {
     private RefreshToken validateRefreshToken(String token) {
         var refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new BadRequestException(INVALID_REFRESH_TOKEN));
-        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
+        if (refreshToken.getExpiredAt().isBefore(Instant.now())) {
             throw new BadRequestException(EXPIRED_REFRESH_TOKEN);
         }
 

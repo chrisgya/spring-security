@@ -1,4 +1,4 @@
-package com.chrisgya.springsecurity.service;
+package com.chrisgya.springsecurity.service.emailService;
 
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;

@@ -1,3 +1,7 @@
+---
+http://localhost:8080/security/swagger-ui.html
+---
+
 Use the following java keytool (shipped with the JDK) command to generate a key pair.
 
 keytool -genkey -alias <alias> -keyalg RSA -keystore <keystore_name>  -keysize 2048

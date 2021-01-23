@@ -38,16 +38,16 @@ public class User extends AbstractEntity implements Serializable {
     @Column(name = "password", nullable = false, length = 1000)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    @Column(name = "is_locked")
-    private boolean isLocked;
-    @Column(name = "lock_expiry_date")
-    private Instant lockExpiryDate;
-    @Column(name = "is_enabled")
-    private boolean isEnabled;
-    @Column(name = "is_confirmed")
-    private boolean isConfirmed;
-    @Column(name = "last_updated")
-    private Instant lastUpdated;
+    @Column(name = "locked")
+    private boolean locked;
+    @Column(name = "lock_expired_at")
+    private Instant lockExpiredAt;
+    @Column(name = "enabled")
+    private boolean enabled;
+    @Column(name = "confirmed")
+    private boolean confirmed;
+    @Column(name = "last_updated_at")
+    private Instant lastUpdatedAt;
 
 //    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 //    @JoinTable(name = "user_roles",

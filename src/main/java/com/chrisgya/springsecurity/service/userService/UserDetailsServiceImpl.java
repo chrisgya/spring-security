@@ -1,4 +1,4 @@
-package com.chrisgya.springsecurity.service;
+package com.chrisgya.springsecurity.service.userService;
 
 import com.chrisgya.springsecurity.dao.UserDao;
 import com.chrisgya.springsecurity.model.UserDetailsImpl;
@@ -8,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -20,7 +23,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("no user found"));
 
-        var permissions = userDao.findUserPermissions(user.getId());
+        List<String> permissions = userDao.findUserPermissions(user.getId())
+                .stream().map(permission -> permission.getName()).collect(Collectors.toList());
+
         return UserDetailsImpl.build(user, permissions);
     }
 }

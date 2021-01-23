@@ -1,14 +1,18 @@
 package com.chrisgya.springsecurity.dao;
 
+import com.chrisgya.springsecurity.entity.Permission;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserPermissionRowMapper implements RowMapper<String> {
+public class UserPermissionRowMapper implements RowMapper<Permission> {
 
     @Override
-    public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return rs.getString("name");
+    public Permission mapRow(ResultSet rs, int rowNum) throws SQLException {
+        var permission = new Permission(rs.getString("name"), rs.getString("description"));
+        permission.setId(rs.getLong("id"));
+
+        return permission;
     }
 }

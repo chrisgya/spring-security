@@ -21,7 +21,4 @@ public class Permission extends AbstractEntity implements Serializable {
     private String name;
     @Column(name = "description", length = 100)
     private String description;
-
-//    @OneToMany(mappedBy = "role_permissions", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    private Set<RolePermissions> rolePermissions = new HashSet<>();
 }

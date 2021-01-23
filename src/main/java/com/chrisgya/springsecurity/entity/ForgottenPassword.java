@@ -23,6 +23,6 @@ public class ForgottenPassword extends SlimAbstractEntity implements Serializabl
     @Column(name = "token")
     private String token;
 
-    @Column(name = "expiry_date", nullable = false)
-    private Instant expiryDate;
+    @Column(name = "expired_at", nullable = false)
+    private Instant expiredAt;
 }

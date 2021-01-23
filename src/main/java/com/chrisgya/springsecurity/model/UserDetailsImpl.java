@@ -28,30 +28,20 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
     @JsonIgnore
-    private boolean isLocked;
+    private boolean locked;
     @JsonIgnore
-    private Instant lockExpiryDate;
+    private Instant lockExpiredAt;
     @JsonIgnore
-    private boolean isEnabled;
+    private boolean enabled;
     @JsonIgnore
-    private boolean isConfirmed;
+    private boolean confirmed;
     private String pictureUrl;
-    private Instant lastUpdated;
+    private Instant lastUpdatedAt;
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(User user, List<String> permissions) {
 
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-
-//        user.getRoles().stream()
-//                .forEach(role -> {
-//                    role.getPermissions().stream()
-//                            .forEach(p -> authorities.add(new SimpleGrantedAuthority(p.getName())));
-//
-//                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-//
-//                });
-
 
         permissions.forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission)));
 
@@ -64,11 +54,11 @@ public class UserDetailsImpl implements UserDetails {
                 user.getLastName(),
                 user.getPassword(),
                 user.isLocked(),
-                user.getLockExpiryDate(),
+                user.getLockExpiredAt(),
                 user.isEnabled(),
                 user.isConfirmed(),
                 user.getPictureUrl(),
-                user.getLastUpdated(),
+                user.getLastUpdatedAt(),
                 authorities
         );
     }
@@ -110,6 +100,6 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     @Override
     public boolean isEnabled() {
-        return isEnabled;
+        return enabled;
     }
 }

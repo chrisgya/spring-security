@@ -2,6 +2,7 @@ package com.chrisgya.springsecurity.service;
 
 import com.chrisgya.springsecurity.AbstractIT;
 import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
+import com.chrisgya.springsecurity.service.userService.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

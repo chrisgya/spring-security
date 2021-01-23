@@ -25,6 +25,7 @@
         <modelmapper.version>2.3.8</modelmapper.version>
         <testcontainers.version>1.15.1</testcontainers.version>
         <javafaker.version>1.0.2</javafaker.version>
+        <springdoc.version>1.5.2</springdoc.version>
     </properties>
 
     <dependencies>
@@ -172,7 +173,11 @@
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

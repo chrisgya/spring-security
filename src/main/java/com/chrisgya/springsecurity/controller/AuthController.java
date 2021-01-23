@@ -5,7 +5,7 @@ import com.chrisgya.springsecurity.model.AuthenticationResponse;
 import com.chrisgya.springsecurity.model.request.LoginRequest;
 import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
 import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
-import com.chrisgya.springsecurity.service.UserServiceImpl;
+import com.chrisgya.springsecurity.service.userService.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

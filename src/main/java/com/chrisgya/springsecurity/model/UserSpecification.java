@@ -18,7 +18,7 @@ public class UserSpecification {
         return (root, query, builder) ->
                 email == null ?
                         builder.conjunction() :
-                        builder.equal(root.get("users").get("username"), email);
+                        builder.equal(root.get("users").get("email"), email);
     }
 
     // if firstname == null then specification is ignored
@@ -38,35 +38,27 @@ public class UserSpecification {
     }
 
     // if isLocked == null then specification is ignored
-    public static Specification<User> userIsLockedEquals(Boolean isLocked) {
+    public static Specification<User> userIsLockedEquals(Boolean locked) {
         return (root, query, builder) ->
-                isLocked == null ?
+                locked == null ?
                         builder.conjunction() :
-                        builder.equal(root.get("users").get("is_locked"), isLocked);
+                        builder.equal(root.get("users").get("locked"), locked);
     }
 
     // if isEnabled == null then specification is ignored
-    public static Specification<User> userIsEnabledEquals(Boolean isEnabled) {
+    public static Specification<User> userIsEnabledEquals(Boolean enabled) {
         return (root, query, builder) ->
-                isEnabled == null ?
+                enabled == null ?
                         builder.conjunction() :
-                        builder.equal(root.get("users").get("is_enabled"), isEnabled);
+                        builder.equal(root.get("users").get("enabled"), enabled);
     }
 
     // if isConfirmed == null then specification is ignored
-    public static Specification<User> userIsConfirmedEquals(Boolean isConfirmed) {
+    public static Specification<User> userIsConfirmedEquals(Boolean confirmed) {
         return (root, query, builder) ->
-                isConfirmed == null ?
+                confirmed == null ?
                         builder.conjunction() :
-                        builder.equal(root.get("users").get("is_confirmed"), isConfirmed);
-    }
-
-    // if isDeleted == null then specification is ignored
-    public static Specification<User> userIsDeleted(Boolean isDeleted) {
-        return (root, query, builder) ->
-                isDeleted == null ?
-                        builder.conjunction() :
-                        builder.equal(root.get("users").get("is_deleted"), isDeleted);
+                        builder.equal(root.get("users").get("confirmed"), confirmed);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.dao;
 
+import com.chrisgya.springsecurity.entity.Permission;
 import com.chrisgya.springsecurity.entity.User;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface UserDao {
     int delete(int id);
 
      List<User> findAll();
-     List<String> findUserPermissions(Long userId);
+     List<Permission> findUserPermissions(Long userId);
 
     Optional<User> findById(int id);
 }

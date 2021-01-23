@@ -1,4 +1,4 @@
-package com.chrisgya.springsecurity.service;
+package com.chrisgya.springsecurity.service.pdfService;
 
 import com.chrisgya.springsecurity.entity.User;
 import com.lowagie.text.DocumentException;
