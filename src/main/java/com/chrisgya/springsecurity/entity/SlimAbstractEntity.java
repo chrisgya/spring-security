@@ -15,6 +15,6 @@ public class SlimAbstractEntity {
     private Long id;
 
     @CreationTimestamp
-    @Column(updatable = false)
-    private Instant created;
+    @Column(name = "created_at",updatable = false)
+    private Instant createdAt;
 }

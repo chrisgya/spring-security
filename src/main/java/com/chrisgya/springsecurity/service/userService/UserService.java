@@ -3,6 +3,7 @@ package com.chrisgya.springsecurity.service.userService;
 import com.chrisgya.springsecurity.entity.Permission;
 import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.User;
+import com.chrisgya.springsecurity.entity.UserRoles;
 import com.chrisgya.springsecurity.model.AuthenticationResponse;
 import com.chrisgya.springsecurity.model.UserDetailsImpl;
 import com.chrisgya.springsecurity.model.UserPage;
@@ -11,11 +12,16 @@ import com.chrisgya.springsecurity.model.request.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
     AuthenticationResponse login(LoginRequest req);
 
     AuthenticationResponse refreshToken(String refreshToken);
+
+    boolean checkIfUsernameExist(String username);
+
+    boolean checkIfEmailExist(String email);
 
     User registerUser(RegisterUserRequest req);
 
@@ -43,7 +49,7 @@ public interface UserService {
 
     void changeEmail(ChangeEmailRequest req);
 
-    void updateUser(UpdateUserRequest req);
+    User updateUser(UpdateUserRequest req);
 
     List<Role> getUserRoles(Long id);
 
@@ -56,4 +62,8 @@ public interface UserService {
     void disableUser(Long id);
 
     List<Permission> getUserPermissions(Long id);
+
+    List<UserRoles> assignUsersToRole(Long roleId, Set<Long> userIds);
+
+    void removeUsersFromRole(Long roleId, Set<Long> userIds);
 }

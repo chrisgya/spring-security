@@ -1,8 +1,6 @@
 package com.chrisgya.springsecurity.controller;
 
-import com.chrisgya.springsecurity.entity.Permission;
-import com.chrisgya.springsecurity.entity.Role;
-import com.chrisgya.springsecurity.entity.User;
+import com.chrisgya.springsecurity.entity.*;
 import com.chrisgya.springsecurity.model.UserPage;
 import com.chrisgya.springsecurity.model.UserParameters;
 import com.chrisgya.springsecurity.service.userService.UserService;
@@ -11,14 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("api/v1/acountmgt")
-@Validated
 @RequiredArgsConstructor
 public class AccountMgtController {
     private final UserService userService;
@@ -52,11 +49,11 @@ public class AccountMgtController {
 
         var userPage = new UserPage();
         userPage.setSortBy(sortField);
-        userPage.setSortDirection(sortDirection.equalsIgnoreCase("asc")? Sort.Direction.ASC : Sort.Direction.DESC);
+        userPage.setSortDirection(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC);
         userPage.setPageNumber(pageNumber);
         userPage.setPageSize(pageSize);
 
-       return userService.getUsers(params, userPage);
+        return userService.getUsers(params, userPage);
     }
 
     @GetMapping("search-users")
@@ -94,32 +91,46 @@ public class AccountMgtController {
         return userService.getUserPermissions(id);
     }
 
+    @PutMapping("assign-users-to-role/{roleId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('can_assign_users_to_role')")
+    public List<UserRoles> assignUsersToRole(@PathVariable Long roleId, @RequestBody Set<Long> userIds) {
+        return userService.assignUsersToRole(roleId, userIds);
+    }
+
+    @PutMapping("remove-users-from-role/{roleId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('can_remove_users_from_role')")
+    public void removeUsersFromRole(@PathVariable Long roleId, @RequestBody Set<Long> userIds) {
+        userService.removeUsersFromRole(roleId, userIds);
+    }
+
     @PutMapping("users/{id}/lock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_lock_user')")
     public void lockUser(@PathVariable Long id) {
-         userService.lockUser(id);
+        userService.lockUser(id);
     }
 
     @PutMapping("users/{id}/unlock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_unlock_user')")
     public void unLockUser(@PathVariable Long id) {
-         userService.unLockUser(id);
+        userService.unLockUser(id);
     }
 
     @PutMapping("users/{id}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_enable_user')")
     public void enableUser(@PathVariable Long id) {
-         userService.enableUser(id);
+        userService.enableUser(id);
     }
 
     @PutMapping("users/{id}/disable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_unlock_user')")
     public void disableUser(@PathVariable Long id) {
-         userService.disableUser(id);
+        userService.disableUser(id);
     }
 
 }

@@ -1,10 +1,13 @@
 package com.chrisgya.springsecurity.controller;
 
+import com.chrisgya.springsecurity.entity.User;
 import com.chrisgya.springsecurity.model.UserDetailsImpl;
 import com.chrisgya.springsecurity.model.request.ChangeEmailRequest;
 import com.chrisgya.springsecurity.model.request.ChangePasswordRequest;
 import com.chrisgya.springsecurity.model.request.UpdateUserRequest;
 import com.chrisgya.springsecurity.service.userService.UserService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -41,13 +44,13 @@ public class UserController {
     }
 
     @PutMapping("me")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUser(@RequestParam @NotBlank @Size(min = 3, max = 50) String firstName,
+    @ResponseStatus(HttpStatus.OK)
+    public User updateUser(@RequestParam @NotBlank @Size(min = 3, max = 50) String firstName,
                            @RequestParam(required = false) @Size(min = 3, max = 50) String middleName,
                            @RequestParam @NotBlank @Size(min = 3, max = 50) String lastName,
-                           @RequestParam(name = "picture", required = false) MultipartFile picture
+                           @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/octet-stream", schema = @Schema(type = "string", format = "binary"))) @RequestParam(name = "picture", required = false) MultipartFile picture
     ) {
-        userService.updateUser(UpdateUserRequest.builder()
+      return  userService.updateUser(UpdateUserRequest.builder()
                 .firstName((firstName))
                 .middleName(middleName)
                 .lastName(lastName)

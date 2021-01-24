@@ -15,6 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+
 import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.NOT_FOUND;
 
 @RequiredArgsConstructor
@@ -37,6 +40,11 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public List<Permission> getPermissions(Set<Long> permissionIds) {
+        return permissionRepository.findAllById(permissionIds);
+    }
+
+    @Override
     public Permission createPermission(CreatePermissionRequest req) {
         var permission = new Permission(req.getName(), req.getDescription());
         return permissionRepository.save(permission);
@@ -48,12 +56,6 @@ public class PermissionServiceImpl implements PermissionService {
         permission.setName(req.getName());
         permission.setDescription(req.getDescription());
         permissionRepository.save(permission);
-    }
-
-    @Override
-    public void deletePermission(Long id) {
-        var permission = getPermission(id);
-        permissionRepository.delete(permission);
     }
 
 }

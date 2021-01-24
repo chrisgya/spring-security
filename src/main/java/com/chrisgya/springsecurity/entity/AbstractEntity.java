@@ -15,8 +15,8 @@ public class AbstractEntity {
     private Long id;
 
     @CreationTimestamp
-    @Column(updatable = false)
-    private Instant created;
+    @Column(name = "created_at",updatable = false)
+    private Instant createdAt;
 
     @Column(name = "created_by", nullable = false, length = 50)
     private String createdBy;

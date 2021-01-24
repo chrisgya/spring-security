@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity(name = "User")
+@Entity
 @Table(name = "users", schema = "bp",
         uniqueConstraints = {
                 @UniqueConstraint(name = "users_username_unique", columnNames = "username"),
@@ -57,7 +57,7 @@ public class User extends AbstractEntity implements Serializable {
 
     //
 //
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true)
     private Set<UserRoles> userRoles = new HashSet<>();
 //
 //    @OneToOne(fetch = FetchType.LAZY)

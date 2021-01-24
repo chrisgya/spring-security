@@ -12,7 +12,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "role_permissions", schema = "bp")
+@Table(name = "role_permissions", schema = "bp", uniqueConstraints = {
+        @UniqueConstraint(name = "permission_role_unique", columnNames = {"permission_id", "role_id"})
+})
 public class RolePermissions extends AbstractEntity{
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -14,6 +14,7 @@ import com.chrisgya.springsecurity.model.request.*;
 import com.chrisgya.springsecurity.repository.*;
 import com.chrisgya.springsecurity.service.emailService.EmailService;
 import com.chrisgya.springsecurity.service.fileStorage.FileStorageService;
+import com.chrisgya.springsecurity.service.roleService.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -42,7 +43,7 @@ import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.*;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserVerificationRepository userVerificationRepository;
     private final ForgottenPasswordRepository forgottenPasswordRepository;
@@ -105,18 +106,19 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @Override
+    public boolean checkIfUsernameExist(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean checkIfEmailExist(String email) {
+        return userRepository.existsByEmail(email);
+    }
 
     @Transactional
     @Override
     public User registerUser(RegisterUserRequest req) {
-
-        if (userRepository.existsByUsername(req.getUsername())) {
-            throw new BadRequestException(String.format(ALREADY_TAKEN, "username"));
-        }
-
-        if (userRepository.existsByEmail(req.getEmail())) {
-            throw new BadRequestException(String.format(ALREADY_TAKEN, "email"));
-        }
 
         var user = User.builder()
                 .username(req.getUsername())
@@ -132,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
         req.getRoleIds().ifPresent(roleIds -> {
             Set<UserRoles> userRoles = new HashSet<>();
-            roleRepository.findAllById(roleIds).stream().collect(Collectors.toSet()).forEach(role -> {
+            roleService.getRoles(roleIds).stream().collect(Collectors.toSet()).forEach(role -> {
                 userRoles.add(new UserRoles(user, role));
             });
 
@@ -321,7 +323,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(UpdateUserRequest req) {
+    public User updateUser(UpdateUserRequest req) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var user = getUserByEmail(authentication.getPrincipal().toString());
         user.setFirstName(req.getFirstName());
@@ -334,13 +336,12 @@ public class UserServiceImpl implements UserService {
             log.info("storedFileResponse: {}", storedFileResponse);
         }
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
     public List<Role> getUserRoles(Long id) {
-        var user = getUser(id);
-        return userRolesRepository.findUserRolesByUser(user)
+        return userRolesRepository.findUserRolesByUserId(id)
                 .stream().map(userRoles -> userRoles.getRole())
                 .collect(Collectors.toList());
     }
@@ -388,6 +389,31 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Permission> getUserPermissions(Long id) {
         return userDao.findUserPermissions(id);
+    }
+
+    @Override
+    public List<UserRoles> assignUsersToRole(Long roleId, Set<Long> userIds) {
+        return userRolesRepository.saveAll(getUserRoles(roleId, userIds));
+    }
+
+    @Override
+    public void removeUsersFromRole(Long roleId, Set<Long> userIds) {
+        userRolesRepository.deleteAll(getUserRoles(roleId, userIds));
+    }
+
+    private Set<UserRoles> getUserRoles(Long roleId, Set<Long> userIds) {
+        var role = roleService.getRole(roleId);
+        Set<UserRoles> userRoles = new HashSet<>();
+
+        var users = userRepository.findAllById(userIds);
+        if (users.isEmpty()) {
+            new NotFoundException(String.format(NOT_FOUND, "users"));
+        }
+        users.stream().forEach(user -> {
+            userRoles.add(UserRoles.builder().role(role).user(user).build());
+        });
+
+        return userRoles;
     }
 
     private String generateVerificationToken(User user) {

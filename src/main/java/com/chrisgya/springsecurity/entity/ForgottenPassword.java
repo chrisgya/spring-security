@@ -16,7 +16,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "forgotten_password", schema = "bp")
 public class ForgottenPassword extends SlimAbstractEntity implements Serializable {
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 

@@ -29,23 +29,33 @@ public class AuthController {
 //        res.addHeader("Refresh-Token", result.getRefreshToken());
 //    }
 
-    @PostMapping("/login")
+    @PostMapping("login")
     @ResponseStatus(HttpStatus.OK)
     public AuthenticationResponse authenticateUser(@Valid @RequestBody LoginRequest req) {
         return userService.login(req);
     }
 
-
-    @GetMapping("/refresh-token/{token}")
+    @GetMapping("refresh-token/{token}")
     @ResponseStatus(HttpStatus.OK)
     public AuthenticationResponse refreshToken(@PathVariable String token) {
         return userService.refreshToken(token);
     }
 
+    @GetMapping("username-exist/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean checkIfUsernameExist(@PathVariable String username) {
+        return userService.checkIfUsernameExist(username);
+    }
+
+    @GetMapping("email-exist/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean checkIfEmailExist(@PathVariable String email) {
+        return userService.checkIfEmailExist(email);
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest req) {
-        var response = userService.registerUser(req);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.registerUser(req));
     }
 
     @PutMapping("/request-confirmation-link/{email}")

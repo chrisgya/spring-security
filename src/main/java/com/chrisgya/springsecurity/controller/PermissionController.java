@@ -56,10 +56,4 @@ public class PermissionController {
     public void updatePermission(@PathVariable Long id, @Valid @RequestBody UpdatePermissionRequest req) {
         permissionService.updatePermission(id, req);
     }
-
-    @DeleteMapping("{id}")
-    @PreAuthorize("hasAuthority('can_delete_permission')")
-    public void deletePermission(@PathVariable Long id) {
-        permissionService.deletePermission(id);
-    }
 }

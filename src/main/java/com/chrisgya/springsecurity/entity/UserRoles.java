@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 
@@ -13,8 +12,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "user_roles", schema = "bp")
-@BatchSize(size = 50)
+@Table(name = "user_roles", schema = "bp", uniqueConstraints = {
+        @UniqueConstraint(name = "user_role_unique", columnNames ={"user_id", "role_id"})
+})
 public class UserRoles extends AbstractEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)

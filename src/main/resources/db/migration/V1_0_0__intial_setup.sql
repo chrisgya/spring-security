@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS bp.users(
     locked BOOLEAN NOT NULL DEFAULT FALSE,
     lock_expired_at TIMESTAMP WITHOUT TIME ZONE,
     enabled BOOLEAN NOT NULL DEFAULT TRUE,
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     last_updated_at  TIMESTAMP WITHOUT TIME ZONE,
     created_by VARCHAR(50) NOT NULL,
     search_field TSVECTOR NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS bp.user_verification(
     id BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('bp.user_verification_id_seq'::regclass),
     user_id BIGINT REFERENCES bp.users(id),
     token TEXT NOT NULL UNIQUE,
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     expired_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS bp.refresh_token(
     id BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('bp.refresh_token_id_seq'::regclass),
     user_id BIGINT REFERENCES bp.users(id),
     token TEXT NOT NULL UNIQUE,
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     expired_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS bp.forgotten_password(
     id BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('bp.forgotten_password_id_seq'::regclass),
     user_id BIGINT REFERENCES bp.users(id),
     token TEXT NOT NULL UNIQUE,
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     expired_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS bp.roles
     name VARCHAR(50) NOT NULL UNIQUE,
     description VARCHAR(100),
     created_by VARCHAR(50) NOT NULL,
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     version BIGINT NOT NULL
 );
 
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS bp.permissions
     id BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('bp.permissions_id_seq'::regclass),
     name VARCHAR(50) NOT NULL UNIQUE,
     description VARCHAR(100),
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     created_by VARCHAR(50) NOT NULL,
     version BIGINT NOT NULL
 );
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS bp.role_permissions(
     id BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('bp.role_permissions_id_seq'::regclass),
     role_id BIGINT REFERENCES bp.roles(id),
     permission_id BIGINT REFERENCES bp.permissions(id),
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     created_by VARCHAR(50) NOT NULL,
     version BIGINT NOT NULL
 );
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS bp.user_roles(
     id BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('bp.user_roles_id_seq'::regclass),
     role_id BIGINT REFERENCES bp.roles(id),
     user_id BIGINT REFERENCES bp.users(id),
-    created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     created_by VARCHAR(50) NOT NULL,
     version BIGINT NOT NULL
 );
