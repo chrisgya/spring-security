@@ -66,7 +66,7 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (JWTVerificationException e) {
-            throw new IllegalStateException(String.format("Invalid token: %s", token));
+           // throw new JWTVerificationException(String.format("Invalid token: %s", token));
         }
 
         filterChain.doFilter(request, response);

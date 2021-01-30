@@ -1,6 +1,6 @@
 package com.chrisgya.springsecurity.config.security;
 
-import com.chrisgya.springsecurity.exception.AccessDeniedException;
+import com.chrisgya.springsecurity.exception.ForbiddenException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -64,6 +64,6 @@ public class JwtHelper {
                 authentication.getPrincipal() instanceof Jwt) {
             return (Jwt) authentication.getPrincipal();
         }
-        throw new AccessDeniedException("Invalid authentication - authentication must not be null and must have a JWT principal");
+        throw new ForbiddenException("Invalid authentication - authentication must not be null and must have a JWT principal");
     }
 }

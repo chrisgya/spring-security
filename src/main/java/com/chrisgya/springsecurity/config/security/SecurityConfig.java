@@ -75,7 +75,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         throw new AccessDeniedException(accessDeniedException.getMessage());
                     }
                 }
-        ).and()
+        )
+                .and()
                 .addFilterBefore(new JwtTokenVerifier(jwtProperties, privateKey, publicKey), UsernamePasswordAuthenticationFilter.class);
     }
 

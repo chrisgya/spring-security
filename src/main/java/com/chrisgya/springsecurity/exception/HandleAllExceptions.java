@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.exception;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.chrisgya.springsecurity.model.ErrorMessage;
 import com.chrisgya.springsecurity.model.ValidationError;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,8 +26,8 @@ import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.PA
 @ControllerAdvice
 public class HandleAllExceptions extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public final ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e, WebRequest req) {
+    @ExceptionHandler(ForbiddenException.class)
+    public final ResponseEntity<?> handleAccessDeniedException(ForbiddenException e, WebRequest req) {
         var response = new ErrorMessage(HttpStatus.FORBIDDEN.value(), new Date(), e.getMessage(), req.getDescription(false));
         return new ResponseEntity(response, HttpStatus.FORBIDDEN);
     }
@@ -77,11 +79,24 @@ public class HandleAllExceptions extends ResponseEntityExceptionHandler {
         return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(TokenExpiredException.class)
+    public final ResponseEntity<?> handleTokenExpiredExceptionException(Exception e) {
+        log.error("TokenExpiredException:: {}", e);
+        var response = new ErrorMessage(HttpStatus.UNAUTHORIZED.value(), new Date(), e.getMessage(), "");
+        return new ResponseEntity(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<?> handleUnhandledException(Exception e) {
         log.error("Exception:: {}", e);
-        var response = new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), new Date(), e.getMessage(), "");
-        return new ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        var message = e.getMessage();
+        var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        if(e instanceof UsernameNotFoundException){
+            message = "invalid token";
+            httpStatus = HttpStatus.UNAUTHORIZED;
+        }
+        var response = new ErrorMessage(httpStatus.value(), new Date(), message, "");
+        return new ResponseEntity(response, httpStatus);
     }
 
 }

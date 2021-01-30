@@ -24,7 +24,7 @@ public class UserDetailsImpl implements UserDetails {
     private String email;
     private String firstName;
     private String middleName;
-    private String lastname;
+    private String lastName;
     @JsonIgnore
     private String password;
     @JsonIgnore
@@ -37,6 +37,7 @@ public class UserDetailsImpl implements UserDetails {
     private boolean confirmed;
     private String pictureUrl;
     private Instant lastUpdatedAt;
+    private Instant createdAt;
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(User user, List<String> permissions) {
@@ -59,6 +60,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.isConfirmed(),
                 user.getPictureUrl(),
                 user.getLastUpdatedAt(),
+                user.getCreatedAt(),
                 authorities
         );
     }

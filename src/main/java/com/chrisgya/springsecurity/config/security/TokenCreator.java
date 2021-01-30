@@ -36,7 +36,7 @@ private final JwtProperties jwtProperties;
         claims.put("userId", String.valueOf(userDetails.getId()));
         claims.put("firstName", userDetails.getFirstName());
         claims.put("middleName", userDetails.getMiddleName());
-        claims.put("lastname", userDetails.getLastname());
+        claims.put("lastName", userDetails.getLastName());
 
         JWTCreator.Builder jwtBuilder = JWT.create().withSubject(userDetails.getEmail()).withClaim("authorities", authorities);
 
