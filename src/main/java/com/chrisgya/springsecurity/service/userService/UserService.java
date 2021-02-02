@@ -10,6 +10,7 @@ import com.chrisgya.springsecurity.model.UserPage;
 import com.chrisgya.springsecurity.model.UserParameters;
 import com.chrisgya.springsecurity.model.request.*;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,8 @@ public interface UserService {
 
     User updateUser(UpdateUserRequest req);
 
+    User updateUserPicture(MultipartFile picture);
+
     List<Role> getUserRoles(Long id);
 
     void lockUser(Long id);
@@ -66,4 +69,6 @@ public interface UserService {
     List<UserRoles> assignUsersToRole(Long roleId, Set<Long> userIds);
 
     void removeUsersFromRole(Long roleId, Set<Long> userIds);
+
+    void changeUsername(ChangeUsernameRequest req);
 }

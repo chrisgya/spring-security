@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -25,6 +24,4 @@ public class UpdateUserRequest {
     @NotBlank
     @Size(min=3, max = 50)
     private String lastName;
-
-    private MultipartFile picture;
 }

@@ -35,7 +35,6 @@ public class HandleAllExceptions extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public final ResponseEntity<?> handleBadRequestException(BadRequestException e, WebRequest req) {
         log.error("BadRequestException:: {}", e);
-
         var response = new ErrorMessage(HttpStatus.BAD_REQUEST.value(), new Date(), e.getMessage(), req.getDescription(false));
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
@@ -80,11 +79,12 @@ public class HandleAllExceptions extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public final ResponseEntity<?> handleTokenExpiredExceptionException(Exception e) {
+    public final ResponseEntity<?> handleTokenExpiredExceptionException(TokenExpiredException e) {
         log.error("TokenExpiredException:: {}", e);
         var response = new ErrorMessage(HttpStatus.UNAUTHORIZED.value(), new Date(), e.getMessage(), "");
         return new ResponseEntity(response, HttpStatus.UNAUTHORIZED);
     }
+
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<?> handleUnhandledException(Exception e) {

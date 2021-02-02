@@ -1,6 +1,8 @@
 package com.chrisgya.springsecurity.utils.validations;
 
 public class ValidationMessage {
+    public static String INVALID_AUTHENTICATION = "invalid username/password";
+    public static String ACCESS_DENIED = "access denied";
     public static String PASSWORD_MISMATCH = "password and confirmPassword do not match";
     public static String NOT_FOUND = "%s not found";
     public static String ALREADY_TAKEN = "%s is already taken!";

@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
@@ -307,9 +308,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void changeEmail(ChangeEmailRequest req) {
-        if (userRepository.existsByEmail(req.getEmail())) {
+        if (checkIfEmailExist(req.getEmail())) {
             throw new BadRequestException(String.format(ALREADY_TAKEN, "email"));
         }
+
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var user = getUserByEmail(authentication.getPrincipal().toString());
@@ -326,18 +328,26 @@ public class UserServiceImpl implements UserService {
     public User updateUser(UpdateUserRequest req) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var user = getUserByEmail(authentication.getPrincipal().toString());
+
         user.setFirstName(req.getFirstName());
         user.setMiddleName(req.getMiddleName());
         user.setLastName(req.getLastName());
 
-        if (req.getPicture() != null) {
-            var storedFileResponse = fileStorageService.storeFile(req.getPicture(), true, null);
-            user.setPictureUrl(storedFileResponse.getPath());
-            log.info("storedFileResponse: {}", storedFileResponse);
-        }
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUserPicture(MultipartFile picture) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var user = getUserByEmail(authentication.getPrincipal().toString());
+
+        var storedFileResponse = fileStorageService.storeFile(picture, true, null);
+        user.setPictureUrl(storedFileResponse.getPath());
+        log.info("storedFileResponse: {}", storedFileResponse);
 
         return userRepository.save(user);
     }
+
 
     @Override
     public List<Role> getUserRoles(Long id) {
@@ -399,6 +409,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeUsersFromRole(Long roleId, Set<Long> userIds) {
         userRolesRepository.deleteAll(getUserRoles(roleId, userIds));
+    }
+
+    @Override
+    public void changeUsername(ChangeUsernameRequest req) {
+        if (checkIfUsernameExist(req.getUsername())) {
+            throw new BadRequestException(String.format(ALREADY_TAKEN, "username"));
+        }
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var user = getUserByEmail(authentication.getPrincipal().toString());
+        user.setUsername(req.getUsername());
+
+        userRepository.save(user);
     }
 
     private Set<UserRoles> getUserRoles(Long roleId, Set<Long> userIds) {
