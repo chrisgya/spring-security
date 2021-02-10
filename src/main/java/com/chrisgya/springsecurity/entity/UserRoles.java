@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Builder
 @NoArgsConstructor
@@ -15,13 +16,13 @@ import javax.persistence.*;
 @Table(name = "user_roles", schema = "bp", uniqueConstraints = {
         @UniqueConstraint(name = "user_role_unique", columnNames ={"user_id", "role_id"})
 })
-public class UserRoles extends AbstractEntity{
+public class UserRoles extends AbstractEntity implements Serializable {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 

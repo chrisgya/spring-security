@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.service.roleService;
 
+import com.chrisgya.springsecurity.entity.Permission;
 import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.RolePermissions;
 import com.chrisgya.springsecurity.exception.NotFoundException;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.NOT_FOUND;
 
@@ -49,6 +51,12 @@ public class RoleServiceImpl implements RoleService {
         return roleRepository.findAllById(roleIds);
     }
 
+    @Override
+    public List<Permission> getPermissionsByRole(Long roleId) {
+        return rolePermissionsRepository.findRolePermissionsByRoleId(roleId)
+                .stream().map(rolePermissions -> rolePermissions.getPermission())
+                .collect(Collectors.toList());
+    }
 
     @Override
     public Role createRole(CreateRoleRequest req) {

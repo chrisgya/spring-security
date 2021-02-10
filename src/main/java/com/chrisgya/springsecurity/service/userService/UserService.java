@@ -38,6 +38,8 @@ public interface UserService {
 
     UserDetailsImpl getCurrentUser();
 
+    Set<Role> getCurrentUserRoles();
+
     User getUser(Long id);
 
     User getUserByEmail(String email);

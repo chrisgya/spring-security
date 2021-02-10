@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(RegisterUserRequest req) {
 
-        var user = User.builder()
+        var userRequest = User.builder()
                 .username(req.getUsername())
                 .email(req.getEmail())
                 .firstName(req.getFirstName())
@@ -130,20 +130,21 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(req.getPassword()))
                 .enabled(true)
                 .build();
-        user.setCreatedBy(req.getEmail());
+        userRequest.setCreatedBy(req.getEmail());
+        var user = userRepository.save(userRequest);
 
 
         req.getRoleIds().ifPresent(roleIds -> {
             Set<UserRoles> userRoles = new HashSet<>();
             roleService.getRoles(roleIds).stream().collect(Collectors.toSet()).forEach(role -> {
-                userRoles.add(new UserRoles(user, role));
+                var userRole = new UserRoles(user, role);
+                userRole.setCreatedBy(req.getEmail());
+                userRoles.add(userRole);
             });
 
-            user.setUserRoles(userRoles);
+            userRolesRepository.saveAll(userRoles);
         });
 
-
-        userRepository.save(user);
 
         String token = generateVerificationToken(user);
 
@@ -254,10 +255,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailsImpl getCurrentUser() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (UserDetailsImpl) userDetailsService.loadUserByUsername(authentication.getPrincipal().toString());
+        return (UserDetailsImpl) userDetailsService.loadUserByUsername(getCurrentUserEmail());
     }
 
+    @Override
+    public Set<Role> getCurrentUserRoles(){
+       return userRolesRepository.findUserRolesByUserEmail(getCurrentUserEmail())
+                .stream().map(userRoles -> userRoles.getRole()).collect(Collectors.toSet());
+    }
+
+    private String getCurrentUserEmail() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getPrincipal().toString();
+    }
 
     @Override
     public User getUser(Long id) {
@@ -423,6 +433,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+
 
     private Set<UserRoles> getUserRoles(Long roleId, Set<Long> userIds) {
         var role = roleService.getRole(roleId);

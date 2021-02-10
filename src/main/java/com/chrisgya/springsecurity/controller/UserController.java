@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.controller;
 
+import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.User;
 import com.chrisgya.springsecurity.model.UserDetailsImpl;
 import com.chrisgya.springsecurity.model.request.ChangeEmailRequest;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -28,6 +30,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserDetailsImpl getCurrentUser() {
         return userService.getCurrentUser();
+    }
+
+    @GetMapping("me/roles")
+    @ResponseStatus(HttpStatus.OK)
+    public Set<Role> getCurrentUserRoles() {
+        return userService.getCurrentUserRoles();
     }
 
     @PostMapping("change-password")

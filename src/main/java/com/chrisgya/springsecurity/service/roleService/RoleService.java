@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.service.roleService;
 
+import com.chrisgya.springsecurity.entity.Permission;
 import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.RolePermissions;
 import com.chrisgya.springsecurity.model.RolePage;
@@ -16,6 +17,8 @@ public interface RoleService {
     Role getRole(Long id);
 
     List<Role> getRoles(Set<Long> roleIds);
+
+    List<Permission> getPermissionsByRole(Long roleId);
 
     Role createRole(CreateRoleRequest req);
 

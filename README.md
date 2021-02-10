@@ -1,5 +1,5 @@
 ---
-http://localhost:8080/security/swagger-ui.html
+ http://localhost:8080/security/swagger-ui.html
 ---
 
 Use the following java keytool (shipped with the JDK) command to generate a key pair.
@@ -15,3 +15,10 @@ I’m using the following command to generate the keypair and move on with our s
 
 References
 ### https://ordina-jworks.github.io/monitoring/2020/11/16/monitoring-spring-prometheus-grafana.html
+
+### INVESTIGATE THE LINKS BELOW
+---
+ https://github.com/rieckpil/blog-tutorials/blob/master/spring-boot-datajpatest/src/test/java/de/rieckpil/blog/OrderRepositoryShortTest.java
+ https://dzone.com/articles/spring-boot-rabbitmq-tutorial-retry-and-error-hand
+---
+

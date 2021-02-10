@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Builder
 @NoArgsConstructor
@@ -15,7 +16,7 @@ import javax.persistence.*;
 @Table(name = "role_permissions", schema = "bp", uniqueConstraints = {
         @UniqueConstraint(name = "permission_role_unique", columnNames = {"permission_id", "role_id"})
 })
-public class RolePermissions extends AbstractEntity{
+public class RolePermissions extends AbstractEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "permission_id", referencedColumnName = "id")

@@ -8,4 +8,5 @@ import java.util.List;
 public interface UserRolesRepository extends JpaRepository<UserRoles, Long> {
     List<UserRoles> findUserRolesByUserId(Long userId);
     List<UserRoles> findUserRolesByRoleId(Long roleId);
+    List<UserRoles> findUserRolesByUserEmail(String userEmail);
 }

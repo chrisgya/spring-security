@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.controller;
 
+import com.chrisgya.springsecurity.entity.Permission;
 import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.RolePermissions;
 import com.chrisgya.springsecurity.model.RolePage;
@@ -47,6 +48,11 @@ public class RoleController {
     @PreAuthorize("hasAnyAuthority('can_read_permissions','can_create_role','can_update_role','can_delete_role')")
     public Role getRole(@PathVariable Long id) {
         return roleService.getRole(id);
+    }
+
+    @GetMapping("{id}/permissions")
+    public List<Permission> getPermissionsByRole(@PathVariable Long id) {
+        return roleService.getPermissionsByRole(id);
     }
 
     @PostMapping

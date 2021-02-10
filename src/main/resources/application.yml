@@ -85,9 +85,9 @@ app:
       key-alias: chrisgyaspsec
       private-key-passphrase: Password@1
       bycriptStrength: 12
-      tokenExpirationAfterSeconds: 1440  #24 hours or 1 day
-      refresh-token-expires-after-seconds: 10080  #7 day
-      activation-token-expiration-after-seconds: 10080  #7 day
+      tokenExpirationAfterSeconds: 28800 #8 hours
+      refresh-token-expires-after-seconds: 604800  #7 day
+      activation-token-expiration-after-seconds: 604800  #7 day
       tokenPrefix: 'Bearer '
       issuer: chrisgya
 
