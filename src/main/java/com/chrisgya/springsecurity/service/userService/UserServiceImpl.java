@@ -10,6 +10,7 @@ import com.chrisgya.springsecurity.entity.*;
 import com.chrisgya.springsecurity.exception.BadRequestException;
 import com.chrisgya.springsecurity.exception.NotFoundException;
 import com.chrisgya.springsecurity.model.*;
+import com.chrisgya.springsecurity.model.querySpecs.UserSpecification;
 import com.chrisgya.springsecurity.model.request.*;
 import com.chrisgya.springsecurity.repository.*;
 import com.chrisgya.springsecurity.service.emailService.EmailService;
@@ -264,6 +265,12 @@ public class UserServiceImpl implements UserService {
                 .stream().map(userRoles -> userRoles.getRole()).collect(Collectors.toSet());
     }
 
+    @Override
+    public List<Permission> getCurrentUserPermissions() {
+        return userDao.findUserPermissionsByUserEmail(getCurrentUserEmail());
+    }
+
+
     private String getCurrentUserEmail() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getPrincipal().toString();
@@ -292,12 +299,12 @@ public class UserServiceImpl implements UserService {
         Specification isConfirmedSpec = UserSpecification.userIsConfirmedEquals(params.getUsersConfirmed());
 
         Specification spec = Specification.where(usernameSpec)
-                .or(emailSpec)
-                .or(firstNameSpec)
-                .or(lastNameSpec)
-                .or(isLockedSpec)
-                .or(isEnabledSpec)
-                .or(isConfirmedSpec);
+                .and(emailSpec)
+                .and(firstNameSpec)
+                .and(lastNameSpec)
+                .and(isLockedSpec)
+                .and(isEnabledSpec)
+                .and(isConfirmedSpec);
 
         Sort sort = Sort.by(userPage.getSortDirection(), userPage.getSortBy());
         Pageable pageable = PageRequest.of(userPage.getPageNumber(), userPage.getPageSize(), sort);
@@ -408,7 +415,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Permission> getUserPermissions(Long id) {
-        return userDao.findUserPermissions(id);
+        return userDao.findUserPermissionsByUserId(id);
     }
 
     @Override
@@ -433,7 +440,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
-
 
     private Set<UserRoles> getUserRoles(Long roleId, Set<Long> userIds) {
         var role = roleService.getRole(roleId);

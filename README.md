@@ -20,5 +20,9 @@ References
 ---
  https://github.com/rieckpil/blog-tutorials/blob/master/spring-boot-datajpatest/src/test/java/de/rieckpil/blog/OrderRepositoryShortTest.java
  https://dzone.com/articles/spring-boot-rabbitmq-tutorial-retry-and-error-hand
----
 
+---
+https://www.baeldung.com/spring-data-jpa-query
+
+https://attacomsian.com/blog/spring-data-jpa-specifications
+---

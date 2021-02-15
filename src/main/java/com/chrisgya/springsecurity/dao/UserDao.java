@@ -14,7 +14,8 @@ public interface UserDao {
     int delete(int id);
 
      List<User> findAll();
-     List<Permission> findUserPermissions(Long userId);
+     List<Permission> findUserPermissionsByUserId(Long userId);
+     List<Permission> findUserPermissionsByUserEmail(String userEmail);
 
     Optional<User> findById(int id);
 }

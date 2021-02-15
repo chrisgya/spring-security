@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,10 +49,14 @@ public class AccountMgtController {
                 .build();
 
         var userPage = new UserPage();
-        userPage.setSortBy(sortField);
-        userPage.setSortDirection(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC);
-        userPage.setPageNumber(pageNumber);
-        userPage.setPageSize(pageSize);
+        if (StringUtils.hasText(sortField))
+            userPage.setSortBy(sortField);
+        if (StringUtils.hasText(sortDirection))
+            userPage.setSortDirection(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC);
+        if (pageNumber != null)
+            userPage.setPageNumber(pageNumber);
+        if (pageSize != null)
+            userPage.setPageSize(pageSize);
 
         return userService.getUsers(params, userPage);
     }

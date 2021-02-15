@@ -1,19 +1,11 @@
 package com.chrisgya.springsecurity;
 
-import com.chrisgya.springsecurity.entity.Permission;
-import com.chrisgya.springsecurity.entity.Role;
-import com.chrisgya.springsecurity.entity.User;
-import com.chrisgya.springsecurity.entity.UserRoles;
-import com.chrisgya.springsecurity.repository.PermissionRepository;
-import com.chrisgya.springsecurity.repository.RoleRepository;
-import com.chrisgya.springsecurity.repository.UserRepository;
-import com.chrisgya.springsecurity.repository.UserRolesRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.chrisgya.springsecurity.entity.*;
+import com.chrisgya.springsecurity.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,70 +16,65 @@ import java.util.*;
 @ConfigurationPropertiesScan
 public class Application {
 
-    @Autowired
-    private PermissionRepository permissionRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserRolesRepository userRolesRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
+    @Transactional
     @Bean
-    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+    public CommandLineRunner commandLineRunner(UserRolesRepository userRolesRepository, UserRepository userRepository, RoleRepository roleRepository, RolePermissionsRepository rolePermissionsRepository, PermissionRepository permissionRepository, PasswordEncoder passwordEncoder) {
         return args -> {
 
             if (permissionRepository.count() < 1) {
-                InitializeAdminUser();
+                var adminEmail = "admin@chrisgya.com";
+
+                var permissions = new String[]{"can_read_users", "can_lock_user", "can_unlock_user", "can_enable_user",
+                        "can_disable_user", "can_read_roles", "can_create_role", "can_update_role", "can_delete_role", "can_assign_users_to_role",
+                        "can_remove_users_from_role", "can_assign_permissions_to_role", "can_remove_permissions_from_role", "can_read_permissions",
+                        "can_create_permission", "can_update_permission" };
+
+                List<Permission> permissionList = new ArrayList<>();
+                Arrays.stream(permissions)
+                        .forEach(permission -> {
+                            var p = new Permission(permission, "");
+                            p.setCreatedBy(adminEmail);
+                            permissionList.add(p);
+                        });
+
+                var permissionsResult = permissionRepository.saveAll(permissionList);
+
+                var roleRequest = new Role("Administrator", "Administrator role");
+                roleRequest.setCreatedBy(adminEmail);
+                var roleResult = roleRepository.save(roleRequest);
+
+                Set<RolePermissions> rolePermissionsSet = new HashSet<>();
+                permissionsResult.stream().forEach(permission -> {
+                    var rp = new RolePermissions(permission, roleResult);
+                    rp.setCreatedBy(adminEmail);
+                    rolePermissionsSet.add(rp);
+                });
+
+                rolePermissionsRepository.saveAll(rolePermissionsSet);
+
+                var userRequest = User.builder()
+                        .username("admin")
+                        .email("admin@chrisgya.com")
+                        .firstName("solomon")
+                        .lastName("Mensah")
+                        .enabled(true)
+                        .confirmed(true)
+                        .locked(false)
+                        .password(passwordEncoder.encode("Password@1"))
+                        .build();
+
+                userRequest.setCreatedBy(adminEmail);
+                var user = userRepository.save(userRequest);
+
+                var userRole = new UserRoles(user, roleResult);
+                userRole.setCreatedBy(adminEmail);
+                userRolesRepository.save(userRole);
             }
         };
     }
 
-    @Transactional
-    public void InitializeAdminUser() {
-        var adminEmail = "admin@chrisgya.com";
-
-        var permissions = new String[]{"can_view_users", "can_lock_user", "can_unlock_user", "can_enable_user",
-                "can_disable_user", "can_read_roles", "can_create_role", "can_update_role", "can_delete_role", "can_assign_users_to_role",
-                "can_remove_users_from_role", "can_assign_permissions_to_role", "can_remove_permissions_from_role", "can_read_permissions",
-                "can_create_permission", "can_update_permission" };
-
-        List<Permission> permissionList = new ArrayList<>();
-        Arrays.stream(permissions)
-                .forEach(permission -> {
-                    var p = new Permission(permission, "");
-                    p.setCreatedBy(adminEmail);
-                    permissionList.add(p);
-                });
-
-        permissionRepository.saveAll(permissionList);
-
-        var roleRequest = new Role("Administrator", "Administrator role");
-        roleRequest.setCreatedBy(adminEmail);
-        var role = roleRepository.save(roleRequest);
-
-        var userRequest = User.builder()
-                .username("admin")
-                .email("admin@chrisgya.com")
-                .firstName("solomon")
-                .lastName("Mensah")
-                .enabled(true)
-                .confirmed(true)
-                .locked(false)
-                .password(passwordEncoder.encode("Password@1"))
-                .build();
-
-        userRequest.setCreatedBy(adminEmail);
-        var user = userRepository.save(userRequest);
-
-        var userRole = new UserRoles(user, role);
-        userRole.setCreatedBy(adminEmail);
-        userRolesRepository.save(userRole);
-    }
 }

@@ -18,11 +18,11 @@ import java.io.Serializable;
 })
 public class RolePermissions extends AbstractEntity implements Serializable {
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "permission_id", referencedColumnName = "id")
     private Permission permission;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 

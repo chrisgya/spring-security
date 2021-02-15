@@ -1,4 +1,4 @@
-package com.chrisgya.springsecurity.model;
+package com.chrisgya.springsecurity.model.querySpecs;
 
 import com.chrisgya.springsecurity.entity.User;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,6 +9,6 @@ public class PermissionSpecification {
         return (root, query, builder) ->
                 name == null ?
                         builder.conjunction() :
-                        builder.equal(root.get("permissions").get("name"), name);
+                        builder.like(builder.lower(root.get("name")), "%" + name.trim().toLowerCase() + "%");
     }
 }

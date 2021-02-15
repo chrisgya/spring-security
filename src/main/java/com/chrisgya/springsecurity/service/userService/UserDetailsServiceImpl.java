@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("no user found"));
 
-        List<String> permissions = userDao.findUserPermissions(user.getId())
+        List<String> permissions = userDao.findUserPermissionsByUserId(user.getId())
                 .stream().map(permission -> permission.getName()).collect(Collectors.toList());
 
         return UserDetailsImpl.build(user, permissions);

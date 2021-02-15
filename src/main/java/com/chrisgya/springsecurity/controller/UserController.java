@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.controller;
 
+import com.chrisgya.springsecurity.entity.Permission;
 import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.User;
 import com.chrisgya.springsecurity.model.UserDetailsImpl;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -36,6 +38,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Set<Role> getCurrentUserRoles() {
         return userService.getCurrentUserRoles();
+    }
+
+    @GetMapping("me/permissions")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Permission> getCurrentUserPermissions() {
+        return userService.getCurrentUserPermissions();
     }
 
     @PostMapping("change-password")

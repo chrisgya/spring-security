@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public class UserDaoImpl implements UserDao {
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -19,7 +20,11 @@ public class UserDaoImpl implements UserDao {
     private final String DELETE_USER_QUERY = "DELETE FROM user WHERE id=?";
     private final String GET_USER_BY_ID_QUERY = "SELECT * FROM user where id = ?";
     private final String GET_USERS_QUERY = "SELECT * FROM user";
-    private final String GET_USER_PERMISSIONS_QUERY = "SELECT p.id, p.name, p.description FROM bp.permissions p JOIN bp.role_permissions rp ON p.id=rp.permission_id JOIN bp.user_roles ur ON rp.role_id= ur.role_id WHERE user_id=?";
+    private final String GET_USER_PERMISSIONS_QUERY = "SELECT  p.id, p.name, p.description,p.created_at,p.created_by FROM bp.permissions p JOIN bp.role_permissions rp ON p.id=rp.permission_id JOIN bp.user_roles ur ON rp.role_id= ur.role_id WHERE ur.user_id=?";
+    private final String GET_USER_PERMISSIONS_BY_USER_EMAIL_QUERY = "SELECT p.id, p.name, p.description,p.created_at,p.created_by FROM bp.permissions p \n" +
+            "JOIN bp.role_permissions rp ON p.id=rp.permission_id \n" +
+            "JOIN bp.user_roles ur ON rp.role_id= ur.role_id\n" +
+            "JOIN bp.users u ON u.id=ur.user_id WHERE u.email=?";
 
     @Override
     public int save(User user) {
@@ -47,8 +52,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<Permission> findUserPermissions(Long userId) {
+    public List<Permission> findUserPermissionsByUserId(Long userId) {
         return jdbcTemplate.query(GET_USER_PERMISSIONS_QUERY, new UserPermissionRowMapper(), new Object[] { userId });
+    }
+
+    @Override
+    public List<Permission> findUserPermissionsByUserEmail(String userEmail) {
+        return jdbcTemplate.query(GET_USER_PERMISSIONS_BY_USER_EMAIL_QUERY, new UserPermissionRowMapper(), new Object[] { userEmail });
     }
 
     @Override

@@ -73,4 +73,6 @@ public interface UserService {
     void removeUsersFromRole(Long roleId, Set<Long> userIds);
 
     void changeUsername(ChangeUsernameRequest req);
+
+    List<Permission> getCurrentUserPermissions();
 }

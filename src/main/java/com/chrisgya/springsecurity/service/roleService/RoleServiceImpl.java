@@ -5,7 +5,7 @@ import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.RolePermissions;
 import com.chrisgya.springsecurity.exception.NotFoundException;
 import com.chrisgya.springsecurity.model.RolePage;
-import com.chrisgya.springsecurity.model.UserSpecification;
+import com.chrisgya.springsecurity.model.querySpecs.RoleSpecification;
 import com.chrisgya.springsecurity.model.request.CreateRoleRequest;
 import com.chrisgya.springsecurity.model.request.UpdateRoleRequest;
 import com.chrisgya.springsecurity.repository.RolePermissionsRepository;
@@ -35,11 +35,14 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Page<Role> getRoles(String name, RolePage rolePage) {
-        Specification spec = Specification.where(UserSpecification.userUsernameEquals(name));
+       Specification spec = Specification.where(RoleSpecification.roleNameEquals(name));
+
         Sort sort = Sort.by(rolePage.getSortDirection(), rolePage.getSortBy());
         Pageable pageable = PageRequest.of(rolePage.getPageNumber(), rolePage.getPageSize(), sort);
+
         return roleRepository.findAll(spec, pageable);
     }
+
 
     @Override
     public Role getRole(Long id) {
@@ -80,12 +83,12 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RolePermissions> assignPermissionsToRole(Long roleId, Set<Long> permissionIds) {
-       return rolePermissionsRepository.saveAll(getRolePermissions( roleId, permissionIds));
+        return rolePermissionsRepository.saveAll(getRolePermissions(roleId, permissionIds));
     }
 
     @Override
     public void removePermissionsFromRole(Long roleId, Set<Long> permissionIds) {
-        rolePermissionsRepository.deleteAll(getRolePermissions( roleId, permissionIds));
+        rolePermissionsRepository.deleteAll(getRolePermissions(roleId, permissionIds));
     }
 
     private Set<RolePermissions> getRolePermissions(Long roleId, Set<Long> permissionIds) {
