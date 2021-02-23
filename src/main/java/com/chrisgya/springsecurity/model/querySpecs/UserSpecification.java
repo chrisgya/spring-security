@@ -2,13 +2,14 @@ package com.chrisgya.springsecurity.model.querySpecs;
 
 import com.chrisgya.springsecurity.entity.User;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 public class UserSpecification {
 
     // if username == null then specification is ignored
     public static Specification<User> userUsernameEquals(String username) {
         return (root, query, builder) ->
-                username == null ?
+                !StringUtils.hasText(username) ?
                         builder.conjunction() :
                         builder.equal(builder.lower(root.get("username")), username.trim().toLowerCase());
                        // builder.equal(root.get("username"), username);
@@ -17,7 +18,7 @@ public class UserSpecification {
     // if email == null then specification is ignored
     public static Specification<User> userEmailEquals(String email) {
         return (root, query, builder) ->
-                email == null ?
+                !StringUtils.hasText(email) ?
                         builder.conjunction() :
                         builder.like(builder.lower(root.get("email")), "%" + email.trim().toLowerCase() + "%");
     }
@@ -25,7 +26,7 @@ public class UserSpecification {
     // if firstname == null then specification is ignored
     public static Specification<User> userFirstnameEquals(String firstName) {
         return (root, query, builder) ->
-                firstName == null ?
+                !StringUtils.hasText(firstName) ?
                         builder.conjunction() :
                         builder.like(builder.lower(root.get("firstName")), "%" + firstName.trim().toLowerCase() + "%");
     }
@@ -33,7 +34,7 @@ public class UserSpecification {
     // if lastname == null then specification is ignored
     public static Specification<User> userLastnameEquals(String lastName) {
         return (root, query, builder) ->
-                lastName == null ?
+                !StringUtils.hasText(lastName) ?
                         builder.conjunction() :
                         builder.like(builder.lower(root.get("lastName")), "%" + lastName.trim().toLowerCase() + "%");
     }

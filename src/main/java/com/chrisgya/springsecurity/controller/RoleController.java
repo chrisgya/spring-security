@@ -70,8 +70,8 @@ public class RoleController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('can_create_role')")
-    public Role createRole(@Valid @RequestBody CreateRoleRequest req) {
-        return roleService.createRole(req);
+    public Role createRole(@Valid @RequestBody CreateRoleRequest createRoleRequest) {
+        return roleService.createRole(createRoleRequest);
     }
 
     @PutMapping("{id}")

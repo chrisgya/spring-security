@@ -1,6 +1,7 @@
 package com.chrisgya.springsecurity.service.permissionService;
 
 import com.chrisgya.springsecurity.entity.Permission;
+import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.exception.NotFoundException;
 import com.chrisgya.springsecurity.model.PermissionPage;
 import com.chrisgya.springsecurity.model.querySpecs.UserSpecification;
@@ -56,6 +57,11 @@ public class PermissionServiceImpl implements PermissionService {
         permission.setName(req.getName());
         permission.setDescription(req.getDescription());
         permissionRepository.save(permission);
+    }
+
+    @Override
+    public List<Role> getPermissionRoles(Long id) {
+        return null;
     }
 
 }

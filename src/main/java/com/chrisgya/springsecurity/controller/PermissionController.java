@@ -1,6 +1,7 @@
 package com.chrisgya.springsecurity.controller;
 
 import com.chrisgya.springsecurity.entity.Permission;
+import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.model.PermissionPage;
 import com.chrisgya.springsecurity.model.request.CreatePermissionRequest;
 import com.chrisgya.springsecurity.model.request.UpdatePermissionRequest;
@@ -9,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/permissions")
@@ -31,10 +34,18 @@ public class PermissionController {
             @RequestParam(required = false) Integer pageSize
     ) {
         var page = new PermissionPage();
-        page.setSortBy(sortField);
-        page.setSortDirection(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC);
-        page.setPageNumber(pageNumber);
-        page.setPageSize(pageSize);
+        if (StringUtils.hasText(sortDirection)) {
+            page.setSortDirection(sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC);
+        }
+        if (StringUtils.hasText(sortField)) {
+            page.setSortBy(sortField);
+        }
+        if (pageNumber != null) {
+            page.setPageNumber(pageNumber);
+        }
+        if (pageSize != null) {
+            page.setPageSize(pageSize);
+        }
 
         return permissionService.getPermissions(name, page);
     }
@@ -44,6 +55,13 @@ public class PermissionController {
     public Permission getPermission(@PathVariable Long id) {
         return permissionService.getPermission(id);
     }
+
+    @GetMapping("{id}/roles")
+    @PreAuthorize("hasAnyAuthority('can_read_permissions', 'can_create_permission', 'can_update_permission', 'can_delete_permission')")
+    public List<Role> getPermissionRoles(@PathVariable Long id) {
+        return permissionService.getPermissionRoles(id);
+    }
+
 
     @PostMapping
     @PreAuthorize("hasAuthority('can_create_permission')")

@@ -55,7 +55,7 @@ public class HandleAllExceptions extends ResponseEntityExceptionHandler {
     public final ResponseEntity<?> dataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error("DataIntegrityViolationException:: {}", e);
 
-        var message = e.getCause().getCause().getMessage().split("=")[1];
+        var message =  e.getCause().getCause().getMessage().contains("=")? e.getCause().getCause().getMessage().split("=")[1] : e.getMessage();
         var response = new ErrorMessage(HttpStatus.BAD_REQUEST.value(), new Date(), message, null);
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }

@@ -3,6 +3,7 @@ package com.chrisgya.springsecurity.service.roleService;
 import com.chrisgya.springsecurity.entity.Permission;
 import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.entity.RolePermissions;
+import com.chrisgya.springsecurity.exception.BadRequestException;
 import com.chrisgya.springsecurity.exception.NotFoundException;
 import com.chrisgya.springsecurity.model.RolePage;
 import com.chrisgya.springsecurity.model.querySpecs.RoleSpecification;
@@ -17,14 +18,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.NOT_FOUND;
+import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.PERMISSION_REQUIRED;
 
 @RequiredArgsConstructor
 @Service
@@ -33,9 +37,10 @@ public class RoleServiceImpl implements RoleService {
     private final RolePermissionsRepository rolePermissionsRepository;
     private final PermissionService permissionService;
 
+
     @Override
     public Page<Role> getRoles(String name, RolePage rolePage) {
-       Specification spec = Specification.where(RoleSpecification.roleNameEquals(name));
+        Specification spec = Specification.where(RoleSpecification.roleNameEquals(name));
 
         Sort sort = Sort.by(rolePage.getSortDirection(), rolePage.getSortBy());
         Pageable pageable = PageRequest.of(rolePage.getPageNumber(), rolePage.getPageSize(), sort);
@@ -61,10 +66,30 @@ public class RoleServiceImpl implements RoleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
-    public Role createRole(CreateRoleRequest req) {
-        var role = new Role(req.getName(), req.getDescription());
-        return roleRepository.save(role);
+    public Role createRole(CreateRoleRequest createRoleRequest) {
+        var permissions = permissionService.getPermissions(createRoleRequest.getPermissionIds());
+        if (permissions.isEmpty()) {
+            throw new BadRequestException(PERMISSION_REQUIRED);
+        }
+
+        var roleRequest = new Role(createRoleRequest.getName(), createRoleRequest.getDescription());
+        var role = roleRepository.save(roleRequest);
+
+        Set<RolePermissions> rolePermissions = new HashSet<>();
+        var createdBy = getCurrentUserEmail();
+        permissions.stream().forEach(permission -> {
+            var rolePermission = new RolePermissions(permission, role);
+            rolePermission.setCreatedBy(createdBy);
+        });
+        rolePermissionsRepository.saveAll(rolePermissions);
+        return role;
+    }
+
+    private String getCurrentUserEmail() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getPrincipal().toString();
     }
 
     @Override

@@ -20,4 +20,5 @@ public class ValidationMessage {
     public static final String FILE_STORAGE_FAILED = "Could not store file %s. Please try again!";
     public static final String INVALID_FILE_NAME = "Filename contains invalid path sequence %S";
     public static final String FILE_DELETION_FAILED = "failed to delete file: %s";
+    public static final String PERMISSION_REQUIRED = "No valid permission was selected";
 }

@@ -1,6 +1,7 @@
 package com.chrisgya.springsecurity.service.permissionService;
 
 import com.chrisgya.springsecurity.entity.Permission;
+import com.chrisgya.springsecurity.entity.Role;
 import com.chrisgya.springsecurity.model.PermissionPage;
 import com.chrisgya.springsecurity.model.request.CreatePermissionRequest;
 import com.chrisgya.springsecurity.model.request.UpdatePermissionRequest;
@@ -19,4 +20,6 @@ public interface PermissionService {
     Permission createPermission(CreatePermissionRequest req);
 
     void updatePermission(Long id, UpdatePermissionRequest req);
+
+    List<Role> getPermissionRoles(Long id);
 }

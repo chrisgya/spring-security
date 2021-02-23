@@ -17,6 +17,6 @@ public class CreatePermissionRequest {
     @Size(min=3, max = 50)
     private String name;
 
-    @Size(max = 100)
+    @Size(min=3, max = 100)
     private String description;
 }
