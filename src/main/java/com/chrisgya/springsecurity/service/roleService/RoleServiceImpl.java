@@ -69,19 +69,30 @@ public class RoleServiceImpl implements RoleService {
     @Transactional
     @Override
     public Role createRole(CreateRoleRequest createRoleRequest) {
-        var permissions = permissionService.getPermissions(createRoleRequest.getPermissionIds());
+        List<Permission> permissions;
+        if(createRoleRequest.getPermissionIds().size() == 1 && createRoleRequest.getPermissionIds().stream().findFirst().get() == -1){
+            permissions = permissionService.getPermissions();
+        }else {
+            permissions = permissionService.getPermissions(createRoleRequest.getPermissionIds());
+        }
+
         if (permissions.isEmpty()) {
             throw new BadRequestException(PERMISSION_REQUIRED);
         }
 
-        var roleRequest = new Role(createRoleRequest.getName(), createRoleRequest.getDescription());
+        var createdBy = getCurrentUserEmail();
+        var roleRequest = Role.builder()
+                .name(createRoleRequest.getName())
+                .description(createRoleRequest.getDescription())
+                .createdBy(createdBy)
+                .build();
+
         var role = roleRepository.save(roleRequest);
 
         Set<RolePermissions> rolePermissions = new HashSet<>();
-        var createdBy = getCurrentUserEmail();
+
         permissions.stream().forEach(permission -> {
-            var rolePermission = new RolePermissions(permission, role);
-            rolePermission.setCreatedBy(createdBy);
+            rolePermissions.add(new RolePermissions(permission, role, createdBy));
         });
         rolePermissionsRepository.saveAll(rolePermissions);
         return role;

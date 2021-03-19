@@ -34,6 +34,8 @@ public class User extends AbstractEntity implements Serializable {
     private String middleName;
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
+    @Column(name = "mobile_no", nullable = false, length = 20)
+    private String mobileNo;
     @Column(name = "picture_url", columnDefinition = "TEXT")
     private String pictureUrl;
     @Column(name = "password", nullable = false, length = 1000)

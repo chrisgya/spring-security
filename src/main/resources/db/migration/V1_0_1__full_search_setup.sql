@@ -4,7 +4,8 @@ CREATE INDEX IF NOT EXISTS users_search_field_idx  ON bp.users USING GIN(search_
             begin
             new.search_field := setweight(to_tsvector('english', coalesce(new.last_name, '')), 'A')
             || setweight(to_tsvector('english', coalesce(new.first_name, '')), 'B')
-            || setweight(to_tsvector('english', coalesce(new.middle_name, '')), 'C');
+            || setweight(to_tsvector('english', coalesce(new.mobile_no, '')), 'C')
+            || setweight(to_tsvector('english', coalesce(new.middle_name, '')), 'D');
             return new;
             end
             $$ LANGUAGE plpgsql;

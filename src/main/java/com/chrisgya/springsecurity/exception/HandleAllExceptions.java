@@ -16,9 +16,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static com.chrisgya.springsecurity.utils.validations.ValidationMessage.PASSWORD_MISMATCH;
 
@@ -58,6 +62,24 @@ public class HandleAllExceptions extends ResponseEntityExceptionHandler {
         var message =  e.getCause().getCause().getMessage().contains("=")? e.getCause().getCause().getMessage().split("=")[1] : e.getMessage();
         var response = new ErrorMessage(HttpStatus.BAD_REQUEST.value(), new Date(), message, null);
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public final ResponseEntity<?> ConstraintViolationException(ConstraintViolationException e) {
+        Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
+
+        List<ValidationError> errors = new ArrayList<>();
+        constraintViolations.stream()
+                .forEach(constraintViolation -> {
+                    String fieldName = null;
+                    for (Path.Node node : constraintViolation.getPropertyPath()) {
+                        fieldName = node.getName();
+                    }
+                    errors.add(new ValidationError(fieldName, constraintViolation.getMessage()));
+                });
+
+        return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
     }
 
     @Override

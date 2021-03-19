@@ -1,5 +1,7 @@
 package com.chrisgya.springsecurity.utils.validations;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -18,7 +20,7 @@ public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, Ch
 
     @Override
     public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-        if (value == null) {
+        if (StringUtils.isBlank(value)) {
             return true;
         }
 

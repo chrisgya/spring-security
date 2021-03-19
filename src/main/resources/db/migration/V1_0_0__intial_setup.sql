@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS bp.users(
     first_name VARCHAR(50) NOT NULL,
     middle_name VARCHAR(50) NULL,
     last_name VARCHAR(50) NOT NULL,
+    mobile_no VARCHAR(20) NOT NULL,
     picture_url VARCHAR(500) NULL,
     password TEXT NOT NULL,
     confirmed BOOLEAN NOT NULL DEFAULT FALSE,

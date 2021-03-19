@@ -27,6 +27,11 @@ public class PermissionServiceImpl implements PermissionService {
     private final PermissionRepository permissionRepository;
 
     @Override
+    public List<Permission> getPermissions() {
+        return permissionRepository.findAll();
+    }
+
+    @Override
     public Page<Permission> getPermissions(String name, PermissionPage permissionPage) {
 
         Specification spec = Specification.where(UserSpecification.userUsernameEquals(name));

@@ -6,6 +6,9 @@ import com.chrisgya.springsecurity.model.request.LoginRequest;
 import com.chrisgya.springsecurity.model.request.RegisterUserRequest;
 import com.chrisgya.springsecurity.model.request.ResetPasswordRequest;
 import com.chrisgya.springsecurity.service.userService.UserServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Tag(name = "User Account management", description = "Manages user account such as user and password management")
+@SecurityRequirement(name = "api")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -29,6 +34,7 @@ public class AuthController {
 //        res.addHeader("Refresh-Token", result.getRefreshToken());
 //    }
 
+    @Operation(summary = "login", description = "login with your registered email and password to obtain access and refresh tokens")
     @PostMapping("login")
     @ResponseStatus(HttpStatus.OK)
     public AuthenticationResponse authenticateUser(@Valid @RequestBody LoginRequest req) {

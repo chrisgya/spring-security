@@ -1,6 +1,7 @@
 package com.chrisgya.springsecurity.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
@@ -12,6 +13,7 @@ import java.time.Instant;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Data
 @Entity
 @Table(name = "roles", schema = "bp")
@@ -37,11 +39,6 @@ public class Role implements Serializable {
 
     @Column(name = "description", length = 100)
     private String description;
-
-    public Role(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
 
     //    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //    private Set<UserRoles> userRoles = new HashSet<>();

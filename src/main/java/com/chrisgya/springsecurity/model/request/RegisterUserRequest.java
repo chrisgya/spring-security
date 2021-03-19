@@ -2,6 +2,7 @@ package com.chrisgya.springsecurity.model.request;
 
 import com.chrisgya.springsecurity.utils.validations.FieldsValueMatch;
 import com.chrisgya.springsecurity.utils.validations.Password;
+import com.chrisgya.springsecurity.utils.validations.Phone;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +39,10 @@ public class RegisterUserRequest {
     @NotBlank
     @Size(min=3, max = 50)
     private String lastName;
+
+    @NotBlank
+    @Phone
+    private String mobileNo;
 
     @Password
     private String password;

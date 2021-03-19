@@ -1,9 +1,14 @@
 package com.chrisgya.springsecurity.controller;
 
-import com.chrisgya.springsecurity.entity.*;
+import com.chrisgya.springsecurity.entity.Permission;
+import com.chrisgya.springsecurity.entity.Role;
+import com.chrisgya.springsecurity.entity.User;
+import com.chrisgya.springsecurity.entity.UserRoles;
 import com.chrisgya.springsecurity.model.UserPage;
 import com.chrisgya.springsecurity.model.UserParameters;
 import com.chrisgya.springsecurity.service.userService.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -15,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
+@Tag(name = "User management By Administrator", description = "System administrator's user management")
+@SecurityRequirement(name = "api")
 @RestController
 @RequestMapping("api/v1/acountmgt")
 @RequiredArgsConstructor

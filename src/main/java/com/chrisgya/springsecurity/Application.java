@@ -43,8 +43,12 @@ public class Application {
 
                 var permissionsResult = permissionRepository.saveAll(permissionList);
 
-                var roleRequest = new Role("Administrator", "Administrator role");
-                roleRequest.setCreatedBy(adminEmail);
+                var roleRequest = Role.builder()
+                        .name("Administrator")
+                        .description("Administrator role")
+                        .createdBy(adminEmail)
+                        .build();
+
                 var roleResult = roleRepository.save(roleRequest);
 
                 Set<RolePermissions> rolePermissionsSet = new HashSet<>();
@@ -61,6 +65,7 @@ public class Application {
                         .email("admin@chrisgya.com")
                         .firstName("solomon")
                         .lastName("Mensah")
+                        .mobileNo("08081535330")
                         .enabled(true)
                         .confirmed(true)
                         .locked(false)

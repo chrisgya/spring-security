@@ -11,6 +11,8 @@ import com.chrisgya.springsecurity.model.request.UpdateUserRequest;
 import com.chrisgya.springsecurity.service.userService.UserService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +23,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
+@Tag(name = "User management", description = "Manages user management")
+@SecurityRequirement(name = "api")
 @RestController
 @RequestMapping("api/v1/users")
 @Validated

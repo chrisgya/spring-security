@@ -14,7 +14,9 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
 
-    @Query(value = "SELECT bp.users.*, ts_rank_cd(search_field, query, 1) AS rank\n" +
+    @Query(value = "SELECT id,username,email, first_name, middle_name,last_name,mobile_no,picture_url," +
+            "confirmed,locked,lock_expired_at,enabled,created_at,last_updated_at,created_by,version, " +
+            "ts_rank_cd(search_field, query, 1) AS rank\n" +
             "FROM bp.users, to_tsquery(?1) query\n" +
             "WHERE query @@ search_field\n" +
             "ORDER BY rank DESC",

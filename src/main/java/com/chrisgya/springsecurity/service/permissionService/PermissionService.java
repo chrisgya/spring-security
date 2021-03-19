@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface PermissionService {
+    List<Permission> getPermissions();
+
     Page<Permission> getPermissions(String name, PermissionPage permissionPage);
 
     Permission getPermission(Long id);

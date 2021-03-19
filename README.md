@@ -26,3 +26,7 @@ https://www.baeldung.com/spring-data-jpa-query
 
 https://attacomsian.com/blog/spring-data-jpa-specifications
 ---
+
+---
+https://www.c-sharpcorner.com/article/how-to-create-and-use-procedure-and-function-postgresql/
+---

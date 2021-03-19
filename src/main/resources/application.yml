@@ -26,13 +26,13 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     hibernate:
-      ddl-auto: update # Hibernate ddl auto (create, create-drop, validate, update)
+      ddl-auto: validate # Hibernate ddl auto (create, create-drop, validate, update)
   servlet:
     multipart:
       max-file-size: 1MB
       max-request-size: 10MB
   flyway:
-    enabled: false
+    enabled: true
     schemas: bp
     user: postgres
     password: Password@1

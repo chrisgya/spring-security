@@ -26,4 +26,9 @@ public class RolePermissions extends AbstractEntity implements Serializable {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
+    public RolePermissions(Permission permission, Role role, String createdBy) {
+        this.permission = permission;
+        this.role = role;
+        this.setCreatedBy(createdBy);
+    }
 }
