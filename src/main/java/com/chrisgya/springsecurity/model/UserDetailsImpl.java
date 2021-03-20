@@ -2,6 +2,7 @@ package com.chrisgya.springsecurity.model;
 
 import com.chrisgya.springsecurity.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@ApiResponse
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode

@@ -7,6 +7,7 @@ import com.chrisgya.springsecurity.entity.UserRoles;
 import com.chrisgya.springsecurity.model.UserPage;
 import com.chrisgya.springsecurity.model.UserParameters;
 import com.chrisgya.springsecurity.service.userService.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class AccountMgtController {
 
     //    hasRole('ROLE_') hasAnyRole('ROLE_') hasAuthority('permission') hasAnyAuthority('permission')
 
+    @Operation(summary = "get users with optional filters", description = "you must have one of these permissions in your role to be able to access this resource: (can_read_users)")
     @GetMapping("users")
     @PreAuthorize("hasAuthority('can_read_users')")
     public Page<User> getUsers(
@@ -68,6 +70,7 @@ public class AccountMgtController {
         return userService.getUsers(params, userPage);
     }
 
+    @Operation(summary = "search users", description = "this uses postgres full-text search feature.you must have one of these permissions in your role to be able to access this resource: (can_read_users)")
     @GetMapping("search-users")
     @PreAuthorize("hasAuthority('can_read_users')")
     public Page<User> searchUsers(
@@ -82,6 +85,7 @@ public class AccountMgtController {
         return userService.searchUsers(searchText, userPage);
     }
 
+    @Operation(summary = "get user by user ID", description = "you must have one of these permissions in your role to be able to access this resource: (can_read_users,can_lock_user,can_unlock_user,can_enable_user,can_disable_user,can_delete_user)")
     @GetMapping("users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('can_read_users','can_lock_user','can_unlock_user','can_enable_user','can_disable_user','can_delete_user')")
@@ -89,6 +93,7 @@ public class AccountMgtController {
         return userService.getUser(id);
     }
 
+    @Operation(summary = "get roles for provided user ID", description = "you must have one of these permissions in your role to be able to access this resource: (can_read_users,can_lock_user,can_unlock_user,can_enable_user,can_disable_user,can_delete_user)")
     @GetMapping("users/{id}/roles")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('can_read_users','can_lock_user','can_unlock_user','can_enable_user','can_disable_user','can_delete_user')")
@@ -96,6 +101,7 @@ public class AccountMgtController {
         return userService.getUserRoles(id);
     }
 
+    @Operation(summary = "get permissions for provided user ID", description = "you must have one of these permissions in your role to be able to access this resource: (can_read_users,can_lock_user,can_unlock_user,can_enable_user,can_disable_user,can_delete_user)")
     @GetMapping("users/{id}/permissions")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('can_read_users','can_lock_user','can_unlock_user','can_enable_user','can_disable_user','can_delete_user')")
@@ -103,6 +109,7 @@ public class AccountMgtController {
         return userService.getUserPermissions(id);
     }
 
+    @Operation(summary = "assign user(s) to a role", description = "you must have one of these permissions in your role to be able to access this resource: (can_assign_users_to_role)")
     @PutMapping("assign-users-to-role/{roleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_assign_users_to_role')")
@@ -110,6 +117,7 @@ public class AccountMgtController {
         return userService.assignUsersToRole(roleId, userIds);
     }
 
+    @Operation(summary = "remove user(s) from a role", description = "you must have one of these permissions in your role to be able to access this resource: (can_remove_users_from_role)")
     @PutMapping("remove-users-from-role/{roleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_remove_users_from_role')")
@@ -117,6 +125,7 @@ public class AccountMgtController {
         userService.removeUsersFromRole(roleId, userIds);
     }
 
+    @Operation(summary = "lock provided user by user ID", description = "you must have one of these permissions in your role to be able to access this resource: (can_lock_user)")
     @PutMapping("users/{id}/lock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_lock_user')")
@@ -124,6 +133,7 @@ public class AccountMgtController {
         userService.lockUser(id);
     }
 
+    @Operation(summary = "unlock provided user by user ID", description = "you must have one of these permissions in your role to be able to access this resource: (can_unlock_user)")
     @PutMapping("users/{id}/unlock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_unlock_user')")
@@ -131,6 +141,7 @@ public class AccountMgtController {
         userService.unLockUser(id);
     }
 
+    @Operation(summary = "enable provided user by user ID", description = "you must have one of these permissions in your role to be able to access this resource: (can_enable_user)")
     @PutMapping("users/{id}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_enable_user')")
@@ -138,6 +149,7 @@ public class AccountMgtController {
         userService.enableUser(id);
     }
 
+    @Operation(summary = "disable provided user by user ID", description = "you must have one of these permissions in your role to be able to access this resource: (can_unlock_user)")
     @PutMapping("users/{id}/disable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('can_unlock_user')")

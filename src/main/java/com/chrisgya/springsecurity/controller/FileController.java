@@ -1,6 +1,9 @@
 package com.chrisgya.springsecurity.controller;
 
 import com.chrisgya.springsecurity.service.fileStorage.FileStorageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -15,12 +18,15 @@ import java.io.IOException;
  * Created by christian.gyaban @ 15/03/2020
  */
 
+@Tag(name = "File Reader", description = "View any uploaded file or document")
+@SecurityRequirement(name = "api")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/files")
 public class FileController {
     private final FileStorageService fileStorageService;
 
+    @Operation(summary = "view file by file url", description = "")
     @GetMapping("/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename, HttpServletRequest request) {

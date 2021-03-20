@@ -6,6 +6,9 @@ import com.chrisgya.springsecurity.service.excelService.ExcelFileExporter;
 import com.chrisgya.springsecurity.service.pdfService.PdfService;
 import com.chrisgya.springsecurity.service.userService.UserService;
 import com.lowagie.text.DocumentException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
@@ -31,6 +34,8 @@ import java.util.Map;
 
 import static com.chrisgya.springsecurity.utils.CommonUtils.retrieveByteArrayInputStream;
 
+@Tag(name = "Demo management By Administrator", description = "This is experimental services")
+@SecurityRequirement(name = "api")
 @RestController
 @RequestMapping("api/v1/demos")
 @RequiredArgsConstructor
@@ -42,6 +47,7 @@ public class DemoController {
 
     //    hasRole('ROLE_') hasAnyRole('ROLE_') hasAuthority('permission') hasAnyAuthority('permission')
 
+    @Operation(summary = "get faker users", description = "demonstrating how hasAnyRole Authorization works")
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_ADMINTRAINEE')")
     public List<FakeUser> getAllFakeUsers() {
@@ -53,6 +59,7 @@ public class DemoController {
 
 
     // http://localhost:8080/security/api/v1/users/export-pdf/1
+    @Operation(summary = "export user to pdf and email at the same time", description = "Demonstrating how to export user details to pdf and send it as email as well")
     @GetMapping(value = "/export-pdf/{id}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> userReport(@PathVariable long id) {
         var user = userService.getUser(id);
@@ -71,6 +78,7 @@ public class DemoController {
     }
 
     // http://localhost:8080/security/api/v1/users/export-html-pdf/1
+    @Operation(summary = "export user to pdf and email at the same time by first formatting the data in html", description = "Demonstrating how to convert data into html before export user details to pdf and send it as email as well")
     @GetMapping("/export-html-pdf/{id}")
     public void generatePdfFromHtml(@PathVariable long id, HttpServletResponse response) {
         var user = userService.getUser(id);
@@ -96,6 +104,7 @@ public class DemoController {
     }
 
     // http://localhost:8080/security/api/v1/users/export-excel
+    @Operation(summary = "export user details to excel", description = "demonstrating how to export user details to excel")
     @GetMapping("export-excel")
     public void downloadExcel(HttpServletResponse response) throws IOException {
 
@@ -111,6 +120,7 @@ public class DemoController {
     }
 
     // http://localhost:8080/security/api/v1/users/export-csv.csv
+    @Operation(summary = "export user details to csv", description = "demonstrating how to export user details to csv")
     @GetMapping("export-csv.csv")
     public void downloadCsv(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");

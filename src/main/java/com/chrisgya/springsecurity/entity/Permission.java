@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.entity;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
 
+@ApiResponse
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
