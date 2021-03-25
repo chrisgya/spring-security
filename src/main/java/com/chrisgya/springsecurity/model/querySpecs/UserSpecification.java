@@ -28,7 +28,7 @@ public class UserSpecification {
         return (root, query, builder) ->
                 !StringUtils.hasText(firstName) ?
                         builder.conjunction() :
-                        builder.like(builder.lower(root.get("firstName")), "%" + firstName.trim().toLowerCase() + "%");
+                        builder.like(builder.lower(root.get("first_name")), "%" + firstName.trim().toLowerCase() + "%");
     }
 
     // if lastname == null then specification is ignored
@@ -36,7 +36,7 @@ public class UserSpecification {
         return (root, query, builder) ->
                 !StringUtils.hasText(lastName) ?
                         builder.conjunction() :
-                        builder.like(builder.lower(root.get("lastName")), "%" + lastName.trim().toLowerCase() + "%");
+                        builder.like(builder.lower(root.get("last_name")), "%" + lastName.trim().toLowerCase() + "%");
     }
 
     // if isLocked == null then specification is ignored

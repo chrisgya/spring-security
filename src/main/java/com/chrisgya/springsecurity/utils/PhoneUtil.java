@@ -3,14 +3,11 @@ package com.chrisgya.springsecurity.utils;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PhoneUtil {
     private static final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
     private static final String REGION_CODE_SEPARATOR = "|";

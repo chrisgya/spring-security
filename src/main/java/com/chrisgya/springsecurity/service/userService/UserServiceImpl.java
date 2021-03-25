@@ -314,7 +314,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> searchUsers(String text, UserPage userPage) {
         Pageable pageable = PageRequest.of(userPage.getPageNumber(), userPage.getPageSize());
-        return userRepository.searchUsers(text, pageable);
+        var searchQuery = text.trim().replaceAll(" ", "|");
+        return userRepository.searchUsers(searchQuery, pageable);
     }
 
     @Override

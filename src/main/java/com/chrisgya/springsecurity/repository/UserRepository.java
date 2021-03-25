@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query(value = "SELECT id,username,email, first_name, middle_name,last_name,mobile_no,picture_url," +
             "confirmed,locked,lock_expired_at,enabled,created_at,last_updated_at,created_by,version, " +
-            "ts_rank_cd(search_field, query, 1) AS rank\n" +
+            "ts_rank_cd(search_field, query) AS rank\n" +
             "FROM bp.users, to_tsquery(?1) query\n" +
             "WHERE query @@ search_field\n" +
             "ORDER BY rank DESC",
@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
                     "FROM bp.users, to_tsquery(?1) query\n" +
                     "WHERE query @@ search_field",
             nativeQuery = true)
-    Page<User> searchUsers(final String text, final Pageable pageable);
+    Page<User> searchUsers(String text, final Pageable pageable);
 
 //    Page<Event> findByName(@Param("name") String name, Pageable pageable);
 //    Page<Event> findByNameAndZoneId(@Param("name") String name, @Param("zoneId") ZoneId zoneId, Pageable pageable);

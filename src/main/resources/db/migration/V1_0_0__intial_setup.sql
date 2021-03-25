@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS bp.users(
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     last_updated_at  TIMESTAMP WITHOUT TIME ZONE,
     created_by VARCHAR(50) NOT NULL,
-    search_field TSVECTOR NOT NULL,
-    version BIGINT NULL
+    version BIGINT NULL,
+    search_field TSVECTOR NOT NULL
 );
 
 CREATE SEQUENCE IF NOT EXISTS bp.user_verification_id_seq AS BIGINT;
