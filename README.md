@@ -30,3 +30,8 @@ https://attacomsian.com/blog/spring-data-jpa-specifications
 ---
 https://www.c-sharpcorner.com/article/how-to-create-and-use-procedure-and-function-postgresql/
 ---
+
+---
+ALTER TABLE TABLE_NAME
+ADD COLUMN IF NOT EXISTS column_name [ DATA TYPE ]
+---

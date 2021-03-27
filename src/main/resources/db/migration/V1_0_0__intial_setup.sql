@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS bp.users(
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     last_updated_at  TIMESTAMP WITHOUT TIME ZONE,
     created_by VARCHAR(50) NOT NULL,
-    version BIGINT NULL,
+    updated_by VARCHAR(50),
+    version BIGINT NOT NULL DEFAULT 0,
     search_field TSVECTOR NOT NULL
 );
 
