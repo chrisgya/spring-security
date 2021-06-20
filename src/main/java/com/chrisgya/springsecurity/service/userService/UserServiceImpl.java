@@ -128,6 +128,7 @@ public class UserServiceImpl implements UserService {
                 .firstName(req.getFirstName())
                 .middleName(req.getMiddleName())
                 .lastName(req.getLastName())
+                .mobileNo(req.getMobileNo())
                 .password(passwordEncoder.encode(req.getPassword()))
                 .enabled(true)
                 .build();

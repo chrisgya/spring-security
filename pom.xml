@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.4</version>
+        <version>2.5.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.chrisgya</groupId>
@@ -16,17 +16,16 @@
 
     <properties>
         <java.version>11</java.version>
-        <java-jwt.version>3.15.0</java-jwt.version>
-        <micrometer.version>1.6.6</micrometer.version>
+        <java-jwt.version>3.16.0</java-jwt.version>
         <itextpdf.version>5.5.13.2</itextpdf.version>
-        <commons-io.version>2.8.0</commons-io.version>
-        <flying-saucer-pdf.version>9.1.20</flying-saucer-pdf.version>
+        <commons-io.version>2.9.0</commons-io.version>
+        <flying-saucer-pdf.version>9.1.22</flying-saucer-pdf.version>
         <poi.version>5.0.0</poi.version>
-        <modelmapper.version>2.4.0</modelmapper.version>
-        <testcontainers.version>1.15.2</testcontainers.version>
+        <modelmapper.version>2.4.4</modelmapper.version>
+        <testcontainers.version>1.15.3</testcontainers.version>
         <javafaker.version>1.0.2</javafaker.version>
-        <springdoc.version>1.5.7</springdoc.version>
-        <libphonenumber.version>8.12.21</libphonenumber.version>
+        <springdoc.version>1.5.9</springdoc.version>
+        <libphonenumber.version>8.12.24</libphonenumber.version>
     </properties>
 
     <dependencies>
@@ -60,10 +59,11 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-data-mongodb</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
@@ -74,17 +74,6 @@
             <version>${java-jwt.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>${micrometer.version}</version>
-        </dependency>
-
-        <!--		<dependency>-->
-        <!--			<groupId>com.google.guava</groupId>-->
-        <!--			<artifactId>guava</artifactId>-->
-        <!--			<version>30.0-jre</version>-->
-        <!--		</dependency>-->
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
@@ -130,18 +119,6 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>

@@ -16,7 +16,7 @@ spring:
       connectionTimeout: 20000
       maximumPoolSize: 5
     name: jpa-pg-datasource
-    url: 'jdbc:postgresql://localhost:5432/spring_security_db'
+    url: 'jdbc:postgresql://localhost:5432/security_db'
     username: postgres
     password: Password@1
   jpa:
@@ -32,7 +32,7 @@ spring:
       max-file-size: 1MB
       max-request-size: 10MB
   flyway:
-    enabled: false
+    enabled: true
     schemas: bp
     user: postgres
     password: Password@1
@@ -98,7 +98,7 @@ custom-thread:
 
 front-end-url:
   base-url: http://localhost:3000
-  confirm-account: http://localhost:3000/verify-account/
-  reset-password: http://localhost:3000/reset-password/
+  confirm-account: http://localhost:3000/auth/verify-account/
+  reset-password: http://localhost:3000/auth/reset-password/
 
 public-paths: /api/v1/auth/**, /api/v1/users/**
