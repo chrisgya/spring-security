@@ -16,9 +16,9 @@ import com.chrisgya.springsecurity.repository.*;
 import com.chrisgya.springsecurity.service.emailService.EmailService;
 import com.chrisgya.springsecurity.service.fileStorage.FileStorageService;
 import com.chrisgya.springsecurity.service.roleService.RoleService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final TokenCreator tokenCreator;
     private final JwtProperties jwtProperties;
-    private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailsService;
     private final EmailService emailService;
     private final MailTemplateProperties mailTemplateProperties;
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
             return AuthenticationResponse.builder()
                     .accessToken(tokenCreator.createJwtForClaims(userDetails))
-                    .refreshToken(generateRefreshToken(modelMapper.map(userDetails, User.class)).getToken())
+                    .refreshToken(generateRefreshToken(objectMapper.convertValue(userDetails, User.class)).getToken())
                     .build();
 
         } catch (AuthenticationException e) {
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
         return AuthenticationResponse.builder()
                 .accessToken(tokenCreator.createJwtForClaims(userDetails))
-                .refreshToken(generateRefreshToken(modelMapper.map(userDetails, User.class)).getToken())
+                .refreshToken(generateRefreshToken(objectMapper.convertValue(userDetails, User.class)).getToken())
                 .build();
     }
 
