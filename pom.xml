@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.2</version>
+        <version>2.6.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.chrisgya</groupId>
@@ -15,15 +15,15 @@
     <description>jwt security with roles and permission management</description>
 
     <properties>
-        <java.version>11</java.version>
-        <java-jwt.version>3.16.0</java-jwt.version>
+        <java.version>17</java.version>
+        <java-jwt.version>8.12.40</java-jwt.version>
         <itextpdf.version>5.5.13.2</itextpdf.version>
-        <commons-io.version>2.9.0</commons-io.version>
+        <commons-io.version>2.11.0</commons-io.version>
         <flying-saucer-pdf.version>9.1.22</flying-saucer-pdf.version>
-        <poi.version>5.0.0</poi.version>
-        <testcontainers.version>1.15.3</testcontainers.version>
+        <poi.version>5.1.0</poi.version>
+        <testcontainers.version>1.16.2</testcontainers.version>
         <javafaker.version>1.0.2</javafaker.version>
-        <springdoc.version>1.5.9</springdoc.version>
+        <springdoc.version>1.6.3</springdoc.version>
         <libphonenumber.version>8.12.24</libphonenumber.version>
     </properties>
 

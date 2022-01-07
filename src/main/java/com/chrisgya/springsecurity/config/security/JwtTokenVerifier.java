@@ -43,11 +43,11 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
         try {
             Algorithm algorithm = Algorithm.RSA256(publicKey, privateKey);
-            JWTVerifier verifier = JWT.require(algorithm)
+            var verifier = JWT.require(algorithm)
                     .withIssuer(jwtProperties.getIssuer())
                     .build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
 
+            DecodedJWT jwt = verifier.verify(token);
 
             String username = jwt.getSubject();
 

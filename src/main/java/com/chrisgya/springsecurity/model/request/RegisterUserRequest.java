@@ -1,5 +1,6 @@
 package com.chrisgya.springsecurity.model.request;
 
+import com.chrisgya.springsecurity.utils.PhoneUtil;
 import com.chrisgya.springsecurity.utils.validations.FieldsValueMatch;
 import com.chrisgya.springsecurity.utils.validations.Password;
 import com.chrisgya.springsecurity.utils.validations.Phone;
@@ -65,5 +66,13 @@ public class RegisterUserRequest {
 
     public Optional<Set<Long>> getRoleIds() {
         return Optional.ofNullable(roleIds);
+    }
+
+    public void setEmail(String email) {
+        this.email = email.toLowerCase();
+    }
+
+    public void setMobileNo(String mobileNo) {
+        this.mobileNo = PhoneUtil.normalize(mobileNo);
     }
 }

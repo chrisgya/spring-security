@@ -29,9 +29,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -54,11 +56,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         if (StringUtils.hasText(publicPaths)) {
-            String[] splitPaths = publicPaths.split(",");
-            for (int i = 0; i < splitPaths.length; i++) {
-                splitPaths[i] = splitPaths[i].trim();
-            }
-            http.authorizeRequests().antMatchers(splitPaths).permitAll();
+            var arrayPath = publicPaths.split(",");
+            var unauthenticatedPaths = Arrays.stream(arrayPath)
+                    .map(p -> p.trim()).collect(Collectors.toSet())
+                    .toArray(arrayPath);
+            http.authorizeRequests().antMatchers(unauthenticatedPaths).permitAll();
         }
 
         http
@@ -68,37 +70,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling().accessDeniedHandler(
-                new AccessDeniedHandlerImpl() {
-                    @Override
-                    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-                        super.handle(request, response, accessDeniedException);
-                        throw new AccessDeniedException(accessDeniedException.getMessage());
-                    }
-                }
-        )
+                        new AccessDeniedHandlerImpl() {
+                            @Override
+                            public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                                super.handle(request, response, accessDeniedException);
+                                throw new AccessDeniedException(accessDeniedException.getMessage());
+                            }
+                        }
+                )
                 .and()
                 .addFilterBefore(new JwtTokenVerifier(jwtProperties, privateKey, publicKey), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        var provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+//    @Bean
+//    @Override
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
