@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <java-jwt.version>8.12.40</java-jwt.version>
+        <java-jwt.version>3.18.2</java-jwt.version>
         <itextpdf.version>5.5.13.2</itextpdf.version>
         <commons-io.version>2.11.0</commons-io.version>
         <flying-saucer-pdf.version>9.1.22</flying-saucer-pdf.version>
