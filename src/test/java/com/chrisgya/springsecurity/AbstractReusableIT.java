@@ -13,10 +13,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public abstract class AbstractReusableIT {
 
-    public static PostgreSQLContainer container = (PostgreSQLContainer) new PostgreSQLContainer("postgres:12.3-alpine")
+    public static PostgreSQLContainer container = (PostgreSQLContainer) new PostgreSQLContainer("postgres:14.1-alpine")
             .withDatabaseName("sp_bp_test")
-            .withUsername("sp_bp_test_user")
-            .withPassword("sp_bp_test_secret")
+            .withUsername("postgres")
+            .withPassword("Password@1")
             .withReuse(true);
 
     static {

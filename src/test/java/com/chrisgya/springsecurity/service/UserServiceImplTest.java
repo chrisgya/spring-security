@@ -21,6 +21,7 @@ class UserServiceImplTest extends AbstractIT {
                 .username(getUsername())
                 .email(getEmailAddress())
                 .firstName(getFirstName())
+                .mobileNo(getPhoneNumber())
                 .middleName(null)
                 .lastName(getLastName())
                 .password("Password@1")
