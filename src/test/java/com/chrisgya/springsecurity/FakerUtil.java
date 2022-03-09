@@ -1,6 +1,7 @@
 package com.chrisgya.springsecurity;
 
-import com.github.javafaker.Faker;
+
+import net.datafaker.Faker;
 
 public class FakerUtil {
     private static final Faker faker = new Faker();

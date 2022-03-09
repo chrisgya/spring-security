@@ -96,11 +96,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return provider;
     }
 
-//    @Bean
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

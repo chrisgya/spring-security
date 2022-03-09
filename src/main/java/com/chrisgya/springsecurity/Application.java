@@ -28,9 +28,14 @@ public class Application {
             if (permissionRepository.count() < 1) {
                 var adminEmail = "admin@chrisgya.com";
 
-                var permissions = new String[]{"can_read_users", "can_lock_user", "can_unlock_user", "can_enable_user",
-                        "can_disable_user", "can_read_roles", "can_create_role", "can_update_role", "can_delete_role", "can_assign_users_to_role",
-                        "can_remove_users_from_role", "can_assign_permissions_to_role", "can_remove_permissions_from_role", "can_read_permissions",
+                var permissions = new String[]{
+                        "can_read_users",
+                        "can_lock_user",
+                        "can_unlock_user", "can_enable_user",
+                        "can_disable_user", "can_read_roles", "can_create_role",
+                        "can_update_role", "can_delete_role", "can_assign_users_to_role",
+                        "can_remove_users_from_role", "can_assign_permissions_to_role",
+                        "can_remove_permissions_from_role", "can_read_permissions",
                         "can_create_permission", "can_update_permission" };
 
                 List<Permission> permissionList = new ArrayList<>();
